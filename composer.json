@@ -1,0 +1,23 @@
+{
+	"name": "aduh95/HTMLGenerator",
+	"autoload": {
+		"psr-4": {
+			"aduh95\\HTMLGenerator\\": "src/"
+		}
+	},
+	"require": {
+		"wa72/htmlpagedom": "^1.2"
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"aduh95\\HTMLGenerator\\tests\\": "tests/"
+		},
+		"files": [
+			"tests/bootstrap.php"
+		]
+	},
+	"require-dev": {
+		"phpunit/phpunit": "~5.0"
+	},
+	"license": "MIT"
+}
