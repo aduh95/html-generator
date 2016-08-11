@@ -13,6 +13,7 @@ use \Wa72\HtmlPageDom\HtmlPageCrawler;
 /**
  * Represents any HTML element
  * @author aduh95
+ * @api
  */
 class HTMLElement extends DOMElement implements ArrayAccess
 {
@@ -202,7 +203,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
     /**
      * Removes an attribute
      *
-     * @param mixed $attribute The attribute to unset
+     * @param string $attribute The attribute to unset
      * @return void
      */
     public function offsetUnset($attribute)
@@ -239,6 +240,15 @@ class HTMLElement extends DOMElement implements ArrayAccess
 	{
 		return $this->parentElement;
 	}
+
+    public function table($attr = array())
+    {
+        $return = $this->append(new Table($this->document))->attr($attr);
+
+        $return->tbody = $return->tbody()->getDOMElement();
+
+        return $return;
+    }
 
 	public function getDOMElement()
 	{
