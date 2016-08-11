@@ -13,8 +13,13 @@ namespace aduh95\HTMLGenerator;
  */
 class Table extends HTMLElement
 {
-    /** @var \DOMElement The <tbody> element of this table */
+    /** @var HTMLElement The <tbody> element of this table */
     protected $tbody;
+
+    /** @var HTMLElement The <thead> element of this table */
+    protected $thead;
+    /** @var HTMLElement The <tfoot> element of this table */
+    protected $tfoot;
 
     const   NO_TFOOT=           1,
             TFOOT_EQUALS_THEAD= 1<<1,
@@ -29,9 +34,96 @@ class Table extends HTMLElement
     /**
      * @param array $attr The attributes of the table
      */
-    protected function __construct(Document $dom)
+    public function __construct(Document $dom)
     {
         parent::__construct($dom, 'table');
+    }
+
+    public function getTHead()
+    {
+        if ($this->thead === null) {
+            $this->thead = $this->prepend($this->document->createElement('thead'));
+        }
+
+        return $this->thead;
+    }
+
+    /**
+     * Add table head (no XSS possible)
+     * @param string[] $th The text values of the table head cells
+     * @return static instance
+     */
+    public function thead($th)
+    {
+        $thead = $this->getTHead()->empty();
+
+        foreach ($th as $value) {
+            $thead->th()->text($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add table head, including content as raw (XSS possible)
+     * @param string[] $th The HTML values of the table head cells
+     * @return static instance
+     */
+    public function theadRaw($th)
+    {
+        $this->getTHead()->empty()->append(array_map(function ($value) {
+            return new HTMLElement($this->document, 'th', $value);
+        }, $th));
+
+        return $this;
+    }
+
+    public function getTFoot()
+    {
+        if ($this->tfoot === null) {
+            $this->tfoot = $this->prepend($this->document->createElement('tfoot'));
+        }
+
+        return $this->tfoot;
+    }
+
+    /**
+     * Add table foot (no XSS possible)
+     * @param string[] $th The text values of the table foot cells
+     * @return static instance
+     */
+    public function tfoot($th)
+    {
+        $tfoot = $this->getTFoot()->empty();
+
+        foreach ($th as $value) {
+            $tfoot->th()->text($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add table foot, including content as raw (XSS possible)
+     * @param string[] $th The HTML values of the table foot cells
+     * @return static instance
+     */
+    public function tfootRaw($th)
+    {
+        $this->getTFoot()->empty()->append(array_map(function ($value) {
+            return new HTMLElement($this->document, 'th', $value);
+        }, $th));
+
+        return $this;
+    }
+
+    /**
+     * Refuses any method name that does not match with a particular table children elements
+     * @throws \Exception
+     */
+    public function __call()
+    {
+        throw new \Exception('Invalid tag name');
     }
 
     /**

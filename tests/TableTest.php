@@ -34,4 +34,27 @@ class TableTest extends TestCase
 
         return $return;
     }
+
+    /**
+     * @test
+     */
+    public function testWholeTableCreation()
+    {
+        $doc = new Document;
+        $table = $doc()->table();
+
+        $headings = ['first <b>set</b>', 'noXSS'];
+        $table->thead($headings)->tfootRaw($headings);
+
+        $table[]= ['I gat powa', 'I am a powerful tool.'];
+        $table[]= ['HTML&amp;Cie.', 'UTF-8: ♥'];
+
+        if (!is_file(Table\WHOLE_TABLE_HTML)) {
+            $fileHandler = fopen(Table\WHOLE_TABLE_HTML, 'w');
+            fwrite($fileHandler, $doc);
+            fclose($fileHandler);
+            $this->assertTrue(false, 'The file did not exist, it has been created');
+        }
+        $this->assertStringEqualsFile(Table\WHOLE_TABLE_HTML, strval($doc));
+    }
 }

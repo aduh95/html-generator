@@ -92,24 +92,6 @@ class Document extends HTMLPage
         $this->scripts[] = array('url'=>$url, 'defer'=>$defer);
     }
 
-    protected function getDocumentHead()
-    {
-        $return = '';
-
-        if ($dom)
-            $return.= HTML::meta(['charset'=>HTML::$char_encode]) .
-                        HTML::meta(['http-equiv'=>'X-UA-Compatible', 'content'=>'IE=edge']) .// Interdit le mode de compatibilité sur IE
-                        // HTML::meta(['http-equiv'=>'viewport', 'content'=>'width=device-width, initial-scale=1']) . // Pour les mobiles
-                        HTML::meta(['name'=>'author', 'content'=>'SEIO']) .
-                        HTML::title($this->title) .
-                        HTML::link(['rel'=>'icon', 'href'=>HTML::relativeLink('~images/Logo_SEIO.png'), 'type'=>'image/png']);
-
-
-        $return.= $this->getDocumentAttachments();
-
-        return $return;
-    }
-
     public function getDocumentAttachments()
     {
         $return = '';

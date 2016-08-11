@@ -7,6 +7,7 @@
 namespace aduh95\HTMLGenerator;
 
 use ArrayAccess;
+use DOMNode;
 use DOMElement;
 use \Wa72\HtmlPageDom\HtmlPageCrawler;
 
@@ -44,6 +45,11 @@ class HTMLElement extends DOMElement implements ArrayAccess
 		return $this;
 	}
 
+    /**
+     * Appends the element(s) in parameter at the end of the current Node
+     * @param mixed ...$elem
+     * @return self
+     */
 	public function append(...$elem)
 	{
 		switch (func_num_args()) {
@@ -79,6 +85,20 @@ class HTMLElement extends DOMElement implements ArrayAccess
 				break;
 		}
 	}
+
+    /**
+     * Prepends the element in parameter at the begining of the current Node
+     * @param \DOMNode $elem
+     * @return \DOMNode The node prepended
+     */
+    public function prepend($elem)
+    {
+        if ($elem instanceof DOMNode) {
+            return $this->getDOMElement()->insertBefore($elem, $this->getDOMElement()->firstChild);
+        } else {
+            throw new \Exception('Not implemented yet.');
+        }
+    }
 
     /**
      * Empty an element <=> remove all of its children

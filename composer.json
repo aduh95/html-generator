@@ -1,5 +1,8 @@
 {
 	"name": "aduh95/HTMLGenerator",
+	"description": "HTML generator in PHP",
+	"keywords": ["php", "html", "dom", "generator", "jquery"],
+	"authors": [{"name": "Antoine du HAMEL", "email": "duhamelantoine1995@gmail.com"}],
 	"autoload": {
 		"psr-4": {
 			"aduh95\\HTMLGenerator\\": "src/"
@@ -17,7 +20,8 @@
 		]
 	},
 	"require-dev": {
-		"phpunit/phpunit": "~5.0"
+		"phpunit/phpunit": "~5.0",
+		"phpdocumentor/phpdocumentor": "~2.0"
 	},
 	"license": "MIT"
 }
