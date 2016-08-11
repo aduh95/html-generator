@@ -98,7 +98,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
      * (Re)Define an attribute or many attributes
      * @param string|array $attribute
      * @param string $value
-     * @return Markup instance
+     * @return static|mixed instance or the value of the attribute
      */
     public function attr($attribute, $value = null)
     {
@@ -107,9 +107,42 @@ class HTMLElement extends DOMElement implements ArrayAccess
                 $this[$key] = $value;
             }
         } else {
-            $this[$attribute] = $value;
+            if (func_num_args()===1) {
+                // If no value is provied, the current value is returned
+                return $this[$attribute];
+            } else {
+                // Else the attribute value is changed (or set)
+                $this[$attribute] = $value;
+            }
         }
         return $this;
+    }
+
+    /**
+     * (Re)Define one or several "data-" attribute(s)
+     * @param string|array $attribute
+     * @param string $value
+     * @return static|mixed instance or the value of the dataset
+     */
+    public function data($attributes, $value = null)
+    {
+        if(is_array($attributes)) {
+            foreach ($attributes as $attribute => $value) {
+                $this->data($attribute, $value);
+            }
+            return $this;
+        } else {
+            // Converts camelCase to HTML convention
+            $attribute = 'data-'.ltrim(strtolower(
+                preg_replace(
+                    ["/([A-Z]+)/", "/-([A-Z]+)([A-Z][a-z])/"],
+                    ["-$1", "-$1-$2"],
+                    $attributes
+                )
+            ), '-');
+
+            return func_num_args()===1 ? $this->attr($attribute) : $this->attr($attribute, $value);
+        }
     }
 
     /**

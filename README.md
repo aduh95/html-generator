@@ -2,7 +2,9 @@
 
 This project is still under developpment, the API may change at any moment. Feel free to contribute or to raise an issue.
 
-This project aims to generate valid and XSS-safe HTML from friendly PHP command. I'll try to implement [jQuery DOM manipulations](http://api.jquery.com/category/manipulation/) methods to make our life of web developper easier. The project is built on PHP's [DOM functions](http://php.net/manual/en/book.dom.php), though the performance are quite good.
+This project aims to generate valid and XSS-safe HTML from friendly PHP command. You can use some of the the [jQuery DOM manipulations](http://api.jquery.com/category/manipulation/) methods, because I missed some of them in PHP. The project is built on PHP's [DOM functions](http://php.net/manual/en/book.dom.php), though the performance are quite good.
+
+Here is an overview:
 
 ```php
 <?php
@@ -13,16 +15,23 @@ $doc = new aduh95\HTMLGenerator\Document('My title', 'en');
 // Add attribute array-like
 $doc->getHeadNode()->appendChild($doc->createElement('meta'))['charset'] = 'uft-8';
 
-$doc()->text('Test') // add text easily
-    ()->text('<script>alert("XSS!");</script>') // XSS protection
+$doc()->p()->text('<script>alert("XSS!");</script>') // add XSS-protected text easily
     ()->p()->append() // add children to an element with a simple method call
-        ()->b('You are looking for something, aren\'t you?')
+        ()->b('You are looking for something, aren\'t you?') // Add text content
+        ()->br() // Auto closing tags are handled
+        ()->a(
+            ['href'=>'http://google.fr/', 'alt'=>'Search the "web"'], // An other method to add attributes
+            'YES, YOU CAN FIND IT!'
+        )->data('user-color', 'red')
         ()->br()
-        ()->a(['href'=>'http://google.fr/', 'alt'=>'Search the "web"'], 'YES, YOU CAN FIND IT!')
-        () // shortcut for getParent
-    ()->p('I ♥ Rock\'n\'Roll!')->attr('test', 4) // add attribute jQuery-like
+        ()->smaller(['class'=>'alert alert-info'])->text('This link is sponsored.')
+        ()
+    ()->p('I ♥ Rock\'n\'Roll!')
+        ->attr('test', 4) // add attribute jQuery-like
+        ->data('HTMLCamelCaseDataInformation', 'valid') // Transform CamelCase dataset to snake_case to match W3C standard
 ;
 
+// If you want PHP to render you HTML in a way a human can read it
 $doc->getDOMDocument()->formatOutput = true;
 
 // This line is optionnal, the document will be automatically output at the end of ths script
@@ -39,9 +48,10 @@ This will output:
 <title>My title</title>
 <meta charset="uft-8">
 </head>
-<body>Test&lt;script&gt;alert("XSS!");&lt;/script&gt;<p><b>You are looking for something, aren't you?</b><br><a href="ht
-tp://google.fr/" alt='Search the "web"'>YES, YOU CAN FIND IT!</a></p>
-<p test="4">I &hearts; Rock'n'Roll!</p>
+<body>
+<p>&lt;script&gt;alert("XSS!");&lt;/script&gt;</p>
+<p><b>You are looking for something, aren't you?</b><br><a href="http://google.fr/" alt='Search the "web"' data-user-color="red">YES, YOU CAN FIND IT!</a><br><smaller class="alert alert-info">This link is sponsored.</smaller></p>
+<p test="4" data-html-camel-case-data-information="valid">I &hearts; Rock'n'Roll!</p>
 </body>
 </html>
 ```

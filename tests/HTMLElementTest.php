@@ -130,4 +130,19 @@ class HTMLElementTest extends TestCase
         $this->assertSame('/p', strrchr($element->getNodePath(), '/'));
         $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->lastChild);
     }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::data
+     * @depends testObjectConstructor
+     */
+    public function testAddingDataAttribute($HTML)
+    {
+        $element = $HTML->data('simple', true);
+        $this->assertTrue(isset($HTML['data-simple']));
+        $this->assertTrue($HTML['data-simple']);
+
+        $element = $HTML->data('HTMLCamelCaseTest', 'value');
+        $this->assertTrue($HTML->getDOMElement()->hasAttribute('data-html-camel-case-test'));
+        $this->assertSame($HTML->data('HTMLCamelCaseTest'), $HTML->attr('data-html-camel-case-test'));
+    }
 }
