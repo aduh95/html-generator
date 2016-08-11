@@ -6,19 +6,38 @@
 
 namespace aduh95\HTMLGenerator;
 
-use DOMText;
 
 /**
  * Represents an empty element
  * @author aduh95
  */
-class EmptyElement extends DOMText
+class EmptyElement
 {
+    public $parentNode;
+
     /**
-     * Overrides parent's constructor
+     * @param HTMLElement|null $parent The parent node of this element
      */
-    public function __construct()
+    public function __construct(HTMLElement $parent = null)
     {
-        parent::__construct('');
+        $this->parentNode = $parent;
+    }
+
+    /**
+     * Does not contain any DOMElement
+     * @return HTMLElement $parent
+     */
+    public function __invoke()
+    {
+        return $this->parentNode;
+    }
+
+    /**
+     * Does not contain any DOMElement
+     * @return null
+     */
+    public function getDOMElement()
+    {
+        return null;
     }
 }

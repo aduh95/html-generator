@@ -13,7 +13,7 @@ use aduh95\HTMLGenerator\HTMLElement;
 
 
 /**
- * Test class for \aduh95\HTMLGenerator\BodyElement
+ * Test class for \aduh95\HTMLGenerator\HTMLElement
  * * @link http://phpunit.de/manual/
  */
 class HTMLElementTest extends TestCase
@@ -81,5 +81,53 @@ class HTMLElementTest extends TestCase
     {
         $div->attr('test', false);
         $this->assertFalse($div->getDOMElement()->hasAttribute('test'));
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::empty
+     * @depends testObjectConstructor
+     */
+    public function testEmptyElement($HTML)
+    {
+        $HTML->p('Some content');
+
+        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
+        $this->assertSame($HTML->getDOMElement(), $HTML->empty()->getDOMElement());
+        $this->assertFalse($HTML->getDOMElement()->hasChildNodes(), 'The element has still children.');
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::append
+     * @depends testObjectConstructor
+     */
+    public function testAppendEmptyElement($HTML)
+    {
+        $this->assertInstanceOf('aduh95\HTMLGenerator\EmptyElement', $HTML->append());
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::append
+     * @depends testObjectConstructor
+     */
+    public function testAppendOneElement($HTML)
+    {
+        $element = $HTML->someElement();
+        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
+        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
+        $this->assertStringEndsWith('/someElement', $element->getNodePath());
+        $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->lastChild);
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::append
+     * @depends testObjectConstructor
+     */
+    public function testAppendHTMLString($HTML)
+    {
+        $element = $HTML->append('<p></p>');
+        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
+        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
+        $this->assertSame('/p', strrchr($element->getNodePath(), '/'));
+        $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->lastChild);
     }
 }

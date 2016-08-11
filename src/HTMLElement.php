@@ -29,12 +29,16 @@ class HTMLElement extends DOMElement implements ArrayAccess
 	}
 
 	/**
-	 * Appends a text node at the element
-	 * @param string $text The text to input
-	 * @return HTMLElement
+	 * Appends a text node at the element, or returns the text value
+	 * @param string|null $text The text to input
+	 * @return HTMLElement|string
 	 */
-	public function text($text = '')
+	public function text($text = null)
 	{
+        if($text===null) {
+            return $this->getDOMElement()->textContent;
+        }
+
 		$this->getDOMElement()->appendChild($this->getDOMDocument()->createTextNode($text));
 		return $this;
 	}
@@ -43,13 +47,15 @@ class HTMLElement extends DOMElement implements ArrayAccess
 	{
 		switch (func_num_args()) {
 			case 0:
-				return $this->append(new EmptyElement($this->document, 'z'));
+				return new EmptyElement($this);
 				break;
 
 			case 1:
 				$elem = array_pop($elem);
 				if (is_object($elem) && $elem instanceof self) {
-					$return = $this->getDOMElement()->appendChild($elem);
+                    if (!($elem instanceof EmptyElement)) {
+					   $return = $this->getDOMElement()->appendChild($elem);
+                    }
 					$return->parentElement = $this;
 
 					return $return;
@@ -72,6 +78,21 @@ class HTMLElement extends DOMElement implements ArrayAccess
 				break;
 		}
 	}
+
+    /**
+     * Empty an element <=> remove all of its children
+     * @return static
+     */
+    public function empty()
+    {
+        $childNodes = $this->getDOMElement()->childNodes;
+
+        for ($item = $childNodes->length; $item;) {
+            $this->getDOMElement()->removeChild($childNodes->item(--$item));
+        }
+
+        return $this;
+    }
 
     /**
      * (Re)Define an attribute or many attributes
@@ -106,11 +127,13 @@ class HTMLElement extends DOMElement implements ArrayAccess
      * Returns the value the attribute set for this tag
      *
      * @param string $attribute The attribute to get
-     * @return mixed The stored result in this object
+     * @return string|boolean The stored result in this object
      */
     public function offsetGet($attribute)
     {
-        return $this->offsetExists($attribute) ? $this->getDOMElement()->getAttribute($attribute) : null;
+        $value = $this->offsetExists($attribute) ? $this->getDOMElement()->getAttribute($attribute) : false;
+
+        return $value===$attribute ? true : $value;
     }
 
     /**
@@ -122,7 +145,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
     public function offsetSet($attribute, $value)
     {
-        if ($value===false) {
+        if ($value===false || $value===null) {
             $this->offsetUnset($attribute);
         } else {
             if ($value===true) {
