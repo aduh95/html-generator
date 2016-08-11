@@ -146,6 +146,17 @@ class HTMLElement extends DOMElement implements ArrayAccess
     }
 
     /**
+     * Removes one or several attribute(s)
+     * Alias of ->attr($attribute, null)
+     * @param string ...$attribute
+     * @return static instance
+     */
+    public function removeAttr($attribute)
+    {
+        array_map([$this, 'attr'], func_get_args(), array_fill(0, func_num_args(), null));
+    }
+
+    /**
      * Checks if an attribute is set for this tag and not null
      *
      * @param string $attribute The attribute to test

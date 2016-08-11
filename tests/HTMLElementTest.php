@@ -53,12 +53,27 @@ class HTMLElementTest extends TestCase
      */
     public function testAddingAttribute($div)
     {
-        $this->assertFalse($div->getDOMElement()->hasAttribute('test'));
-        $div->attr('test', 'value');
-        $this->assertTrue($div->getDOMElement()->hasAttribute('test'));
-        $this->assertSame($div->getDOMElement()->getAttribute('test'), 'value');
+        $attrName = 'test';
+        $attrValue = 'value';
 
-        return $div;
+        $this->assertFalse($div->getDOMElement()->hasAttribute($attrName));
+        $div->attr($attrName, $attrValue);
+        $this->assertTrue($div->getDOMElement()->hasAttribute($attrName));
+        $this->assertSame($div->getDOMElement()->getAttribute($attrName), $attrValue);
+
+        return $attrName;
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::removeAttr
+     * @depends testObjectConstructor
+     * @depends testAddingAttribute
+     */
+    public function testRemovingAttribute($div, $attrName)
+    {
+        $this->assertTrue($div->getDOMElement()->hasAttribute($attrName));
+        $div->removeAttr($attrName);
+        $this->assertFalse($div->getDOMElement()->hasAttribute($attrName));
     }
 
     /**
@@ -67,20 +82,25 @@ class HTMLElementTest extends TestCase
      */
     public function testAddingBooleanAttribute($div)
     {
-        $this->assertFalse($div->getDOMElement()->hasAttribute('testBool'));
-        $div->attr('testBool', true);
-        $this->assertTrue($div->getDOMElement()->hasAttribute('testBool'));
-        $this->assertSame($div->getDOMElement()->getAttribute('testBool'), 'testBool');
+        $attrName = 'testBool';
+
+        $this->assertFalse($div->getDOMElement()->hasAttribute($attrName));
+        $div->attr($attrName, true);
+        $this->assertTrue($div->getDOMElement()->hasAttribute($attrName));
+        $this->assertSame($div->getDOMElement()->getAttribute($attrName), $attrName);
+
+        return $attrName;
     }
 
     /**
      * @covers \aduh95\HTMLGenerator\HTMLElement::attr
-     * @depends testAddingAttribute
+     * @depends testObjectConstructor
+     * @depends testAddingBooleanAttribute
      */
-    public function testRemovingAttribute($div)
+    public function testRemovingBooleanAttribute($div, $attrName)
     {
-        $div->attr('test', false);
-        $this->assertFalse($div->getDOMElement()->hasAttribute('test'));
+        $div->attr('testBool', false);
+        $this->assertFalse($div->getDOMElement()->hasAttribute('testBool'));
     }
 
     /**
