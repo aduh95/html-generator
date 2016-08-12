@@ -63,7 +63,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
                     if (!($elem instanceof EmptyElement)) {
 					   $return = $this->getDOMElement()->appendChild($elem);
                     }
-					$return->parentElement = $this;
+                    $this->affiliate($return);
 
 					return $return;
 				} else {
@@ -94,10 +94,28 @@ class HTMLElement extends DOMElement implements ArrayAccess
     public function prepend($elem)
     {
         if ($elem instanceof DOMNode) {
-            return $this->getDOMElement()->insertBefore($elem, $this->getDOMElement()->firstChild);
+            return $this->affiliate(
+                $this->getDOMElement()->hasChildNodes() ?
+                    $this->getDOMElement()->insertBefore($elem, $this->getDOMElement()->firstChild) :
+                    $this->getDOMElement()->appendChild($elem)
+            );
         } else {
             throw new \Exception('Not implemented yet.');
         }
+    }
+
+    /**
+     * Affiliates an element to this object
+     * @param  \DOMNode 
+     * @return \DOMNode
+     */
+    protected function affiliate($elem)
+    {
+        if ($elem instanceof self) {
+            $elem->parentElement = $this;
+        }
+
+        return $elem;
     }
 
     /**
@@ -263,11 +281,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
     public function table($attr = array())
     {
-        $return = $this->append(new Table($this->document))->attr($attr);
-
-        $return->tbody = $return->tbody()->getDOMElement();
-
-        return $return;
+        return $this->append(new Table($this->document))->attr($attr)->init();
     }
 
 	public function getDOMElement()

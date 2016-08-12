@@ -19,15 +19,25 @@ use aduh95\HTMLGenerator\Table;
 class TableTest extends TestCase
 {
     /** @var \aduh95\HTMLGenerator\Document */
-    protected $document;
+    protected static $document;
+
+    /**
+     * @return \aduh95\HTMLGenerator\Document
+     */
+    public function getDocument()
+    {
+        if (!isset(self::$document)) {
+            self::$document = new Document;
+        }
+        return self::$document;
+    }
 
     /**
      * @covers \aduh95\HTMLGenerator\Table::__construct
      */
     public function testObjectConstructor()
     {
-        $this->document = new Document;
-        $return = ($this->document)()->table();
+        $return = $this->getDocument()()->table();
 
         $this->assertInstanceOf('aduh95\HTMLGenerator\Table', $return);
         $this->assertInstanceOf('DOMElement', $return);
@@ -36,12 +46,11 @@ class TableTest extends TestCase
     }
 
     /**
-     * @test
+     * @depends testObjectConstructor
      */
-    public function testWholeTableCreation()
+    public function testWholeTableCreation($table)
     {
-        $doc = new Document;
-        $table = $doc()->table();
+        $doc = $this->getDocument();
 
         $headings = ['first <b>set</b>', 'noXSS'];
         $table->thead($headings)->tfootRaw($headings);

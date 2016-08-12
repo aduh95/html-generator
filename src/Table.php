@@ -13,13 +13,16 @@ namespace aduh95\HTMLGenerator;
  */
 class Table extends HTMLElement
 {
-    /** @var HTMLElement The <tbody> element of this table */
-    protected $tbody;
+    /** @var HTMLElement The <caption> element of this table */
+    protected $caption;
 
     /** @var HTMLElement The <thead> element of this table */
     protected $thead;
     /** @var HTMLElement The <tfoot> element of this table */
     protected $tfoot;
+
+    /** @var HTMLElement The <tbody> element of this table */
+    protected $tbody;
 
     const   NO_TFOOT=           1,
             TFOOT_EQUALS_THEAD= 1<<1,
@@ -39,10 +42,39 @@ class Table extends HTMLElement
         parent::__construct($dom, 'table');
     }
 
+    /**
+     * Initiates the DOM structure as soon as DOM can be modified
+     * @return self instance
+     */
+    protected function init()
+    {
+        $this->tbody = parent::append($this->document->createElement('tbody'));
+        return $this;
+    }
+
+    /**
+     * Set the <caption> of this <table>
+     * @return self instance
+     */
+    public function caption($content = null)
+    {
+        if ($content === null && isset($this->caption)) {
+            $this->getDOMElement()->removeChild($this->caption);
+        } elseif (isset($this->caption)) {
+            $this->caption->empty()->text($content);
+        } else {
+            parent::prepend($this->document->createElement('caption'))->text($content);
+        }
+    }
+
+    /**
+     * Creates the <thead> element if it does not exist yet
+     * @return HTMLElement The <thead> element of this table
+     */
     public function getTHead()
     {
         if ($this->thead === null) {
-            $this->thead = $this->prepend($this->document->createElement('thead'));
+            $this->thead = parent::prepend($this->document->createElement('thead'));
         }
 
         return $this->thead;
@@ -78,10 +110,14 @@ class Table extends HTMLElement
         return $this;
     }
 
+    /**
+     * Creates the <tfoot> element if it does not exist yet
+     * @return HTMLElement The <tfoot> element of this table
+     */
     public function getTFoot()
     {
         if ($this->tfoot === null) {
-            $this->tfoot = $this->prepend($this->document->createElement('tfoot'));
+            $this->tfoot = parent::prepend($this->document->createElement('tfoot'));
         }
 
         return $this->tfoot;
@@ -121,7 +157,7 @@ class Table extends HTMLElement
      * Refuses any method name that does not match with a particular table children elements
      * @throws \Exception
      */
-    public function __call()
+    public function __call($name, $value)
     {
         throw new \Exception('Invalid tag name');
     }

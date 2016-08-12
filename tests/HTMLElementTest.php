@@ -19,7 +19,18 @@ use aduh95\HTMLGenerator\HTMLElement;
 class HTMLElementTest extends TestCase
 {
     /** @var \aduh95\HTMLGenerator\Document */
-    protected $document;
+    protected static $document;
+
+    /**
+     * @return \aduh95\HTMLGenerator\Document
+     */
+    public function getDocument()
+    {
+        if (!isset(self::$document)) {
+            self::$document = new Document;
+        }
+        return self::$document;
+    }
 
     /**
      * @covers \aduh95\HTMLGenerator\HTMLElement::__construct
@@ -27,8 +38,7 @@ class HTMLElementTest extends TestCase
      */
     public function testObjectConstructor()
     {
-        $this->document = new Document;
-        $return = ($this->document)()->append($this->document->createElement('div'));
+        $return = $this->getDocument()()->append($this->getDocument()->createElement('div'));
 
         $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $return);
         $this->assertInstanceOf('DOMElement', $return);
@@ -131,6 +141,20 @@ class HTMLElementTest extends TestCase
      */
     public function testAppendOneElement($HTML)
     {
+        $tagName = 'someElement'.rand();
+        $element = $HTML->append($this->getDocument()->createElement($tagName));
+        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
+        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
+        $this->assertStringEndsWith('/'.$tagName, $element->getNodePath());
+        $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->lastChild);
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::append
+     * @depends testObjectConstructor
+     */
+    public function testAppendOneElementUsingMagicMethod($HTML)
+    {
         $element = $HTML->someElement();
         $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
         $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
@@ -164,5 +188,26 @@ class HTMLElementTest extends TestCase
         $element = $HTML->data('HTMLCamelCaseTest', 'value');
         $this->assertTrue($HTML->getDOMElement()->hasAttribute('data-html-camel-case-test'));
         $this->assertSame($HTML->data('HTMLCamelCaseTest'), $HTML->attr('data-html-camel-case-test'));
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::data
+     * @depends testObjectConstructor
+     */
+    public function testPrendingOneElement($HTML)
+    {
+        $document = $this->getDocument();
+
+        $element = $HTML->empty()->prepend($document->createElement('secondElement'));
+        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
+        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
+        $this->assertStringEndsWith('/secondElement', $element->getNodePath());
+        $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->firstChild);
+
+        $element = $HTML->empty()->prepend($document->createElement('firstElement'));
+        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
+        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
+        $this->assertStringEndsWith('/firstElement', $element->getNodePath());
+        $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->firstChild);
     }
 }
