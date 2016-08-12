@@ -24,8 +24,11 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
 	public function __construct(Document $dom, $tagName, $rawContent = '')
 	{
-		parent::__construct($tagName, $rawContent);
+		parent::__construct($tagName);
+
 		$this->document = $dom;
+        $this->document->getDOMDocument()->importNode($this);
+        HtmlPageCrawler::create($rawContent)->appendTo($this);
         // $this->DOMElement = $this->getDOMDocument()->createElement($tagName);
         // $dom->getDOMDocument()->importNode($this->getDOMElement());
 	}
@@ -50,7 +53,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
      * @param mixed ...$elem
      * @return self
      */
-	public function append(...$elem)
+	public function append($elem = null)
 	{
 		switch (func_num_args()) {
 			case 0:
@@ -58,7 +61,6 @@ class HTMLElement extends DOMElement implements ArrayAccess
 				break;
 
 			case 1:
-				$elem = array_pop($elem);
 				if (is_object($elem) && $elem instanceof self) {
                     if (!($elem instanceof EmptyElement)) {
 					   $return = $this->getDOMElement()->appendChild($elem);
@@ -67,12 +69,13 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
 					return $return;
 				} else {
-					return HtmlPageCrawler::create($elem)->appendTo($this);
+					HtmlPageCrawler::create($elem)->appendTo($this);
+                    return $this->lastChild;
 				}
 				break;
 
 			default:
-				foreach ($elem as $element) {
+				foreach (func_get_args() as $element) {
 					if (is_string($element)) {
 						if (strncmp($element, '<', 1)) {
 							$this->text($element);
@@ -274,11 +277,27 @@ class HTMLElement extends DOMElement implements ArrayAccess
 		return HtmlPageCrawler::create($this->getDOMElement())->saveHTML();
 	}
 
+    /**
+     * Returns the parent of the element
+     * @return self|null The parent of the current object
+     */
 	public function parent()
 	{
 		return $this->parentElement;
 	}
 
+    /**
+     * Removes the current object of its parent's chil nodes
+     */
+    public function remove()
+    {
+        $this->parent()->getDOMElement()->removeChild($this);
+    }
+
+    /**
+     * Creates a HTML <table>
+     * @return \aduh95\HTMLGenerator\Table The table object created
+     */
     public function table($attr = array())
     {
         return $this->append(new Table($this->document))->attr($attr)->init();

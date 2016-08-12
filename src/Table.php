@@ -87,10 +87,10 @@ class Table extends HTMLElement
      */
     public function thead($th)
     {
-        $thead = $this->getTHead()->empty();
+        $theadRow = $this->getTHead()->empty()->tr();
 
         foreach ($th as $value) {
-            $thead->th()->text($value);
+            $theadRow->th()->text($value);
         }
 
         return $this;
@@ -103,7 +103,7 @@ class Table extends HTMLElement
      */
     public function theadRaw($th)
     {
-        $this->getTHead()->empty()->append(array_map(function ($value) {
+        $this->getTHead()->empty()->tr()->append(array_map(function ($value) {
             return new HTMLElement($this->document, 'th', $value);
         }, $th));
 
@@ -117,7 +117,7 @@ class Table extends HTMLElement
     public function getTFoot()
     {
         if ($this->tfoot === null) {
-            $this->tfoot = parent::prepend($this->document->createElement('tfoot'));
+            $this->tfoot = $this->getDOMElement()->insertBefore($this->document->createElement('tfoot'), $this->tbody);
         }
 
         return $this->tfoot;
@@ -130,10 +130,10 @@ class Table extends HTMLElement
      */
     public function tfoot($th)
     {
-        $tfoot = $this->getTFoot()->empty();
+        $tfootRow = $this->getTFoot()->empty()->tr();
 
         foreach ($th as $value) {
-            $tfoot->th()->text($value);
+            $tfootRow->th()->text($value);
         }
 
         return $this;
@@ -146,9 +146,72 @@ class Table extends HTMLElement
      */
     public function tfootRaw($th)
     {
-        $this->getTFoot()->empty()->append(array_map(function ($value) {
-            return new HTMLElement($this->document, 'th', $value);
+        $doc = $this->document;
+        $this->getTFoot()->empty()->tr()->append(array_map(function ($value) use ($doc) {
+            return new HTMLElement($doc, 'th', $value);
         }, $th));
+
+        return $this;
+    }
+
+    /**
+     * Add a line to the tbody of the current table
+     *
+     * If you pass an array of string, a DOMNodeList (containing <td> or <th>)
+     * object or a DOMElement (a <tr>), one single line will be added.
+     * You can also pass an array of one of the previous elements or a
+     * DOMNodeList containing <tr> to add several lines.
+     * You can also pass several arguments to add several lines.
+     *
+     * @param string[]|string[][]|\DOMNodeList|\DOMNodeList[]|\DOMElement|\DOMElement[] ...$line The line(s) to add
+     * @return self instance
+     */
+    public function append($line = null)
+    {
+        switch (func_num_args()) {
+            case 0:
+                break;
+
+            case 1:
+                $newLine = $this->tbody->tr();
+                
+                if (is_array($line)) {
+                    foreach ($line as $content) {
+                        if (is_array($content)) {
+                            $this->append($content);
+                        } else {
+                            $newLine->td()->text($content);
+                        }
+                    }
+                } elseif ($line instanceof DOMElement && strtolower($line->nodeName)==='tr') {
+                    $this->tbody->append($line);
+                } elseif ($line instanceof DOMNodeList) {
+                    foreach ($line as $lineElem) {
+                        switch (strtolower($line->nodeName)) {
+                            case 'tr':
+                                $this->append($lineElem);
+                                break;
+
+                            case 'td':
+                            case 'th':
+                                $newLine->append($lineElem);
+                                break;
+                            
+                            default:
+                                $newLine->td()->text($lineElem);
+                                break;
+                        }
+                    }
+                }
+                if(!$newLine->getDOMElement()->hasChildNodes()) {
+                    $newLine->remove();
+                }
+                break;
+
+            default:
+                array_map([$this, __METHOD__], func_get_args());
+                break;
+        }
 
         return $this;
     }
@@ -201,7 +264,7 @@ class Table extends HTMLElement
     public function offsetSet($attribute, $value)
     {
         if ($attribute === null) {
-            $this->addLine();
+            $this->append($value);
         } else {
             return parent::offsetSet($attribute, $value);
         }
