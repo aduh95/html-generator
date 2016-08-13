@@ -316,11 +316,14 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
     /**
      * Creates a HTML <table>
+     * @param array $attr The attributes for the <table> element
+     * @param int $options @see Table::__construct
+     * @param int $autoRows @see Table::__construct
      * @return \aduh95\HTMLGenerator\Table The table object created
      */
-    public function table($attr = array())
+    public function table($attr = array(), $options = Table::AUTO_TFOOT, $autoRows = 10)
     {
-        return $this->append(new Table($this->document))->attr($attr);
+        return $this->append(new Table($this->document, $options, $autoRows))->attr($attr);
     }
 
 	public function getDOMElement()
