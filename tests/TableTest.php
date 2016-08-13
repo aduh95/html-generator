@@ -53,8 +53,11 @@ class TableTest extends TestCase
         $doc = $this->getDocument();
 
         $headings = ['first <b>set</b>', 'noXSS'];
-        // $headings = ['first set', 'noXSS'];
-        $table->thead($headings)->tfootRaw($headings);
+
+        $table
+            ->tfootRaw($headings)
+            ->caption('Hello')
+            ->thead($headings);
 
         $table[]= ['I gat powa', 'I am a powerful tool.'];
         $table[]= ['HTML&amp;Cie.', 'UTF-8: ♥'];

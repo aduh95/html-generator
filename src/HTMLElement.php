@@ -320,7 +320,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
     public function table($attr = array())
     {
-        return $this->append(new Table($this->document))->attr($attr)->init();
+        return $this->append(new Table($this->document))->attr($attr);
     }
 
 	public function getDOMElement()

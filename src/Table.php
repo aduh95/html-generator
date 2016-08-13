@@ -24,32 +24,39 @@ class Table extends HTMLElement
     /** @var HTMLElement The <tbody> element of this table */
     protected $tbody;
 
-    const   NO_TFOOT=           1,
-            TFOOT_EQUALS_THEAD= 1<<1,
-            AUTO =              1<<2,
-            TBODY_NO_XSS =      1<<3,
-            TITLES_NO_XSS =     1<<4,
-            DATATABLE  =        1<<5,
-            TABLELINK  =        1<<6,
-            NO_DEFAULT_CLASSES= 1<<7,
-            ROWED =             1<<8;
+    /** @var int A bitmask of the options for this table */
+    protected $options;
+
+    /** @var int The number of rows to display the <tfoot> */
+    protected $autoRows;
+
+    const
+        /** @var int Option to not have any <tfoot> */
+        NO_TFOOT = 1,
+        /** @var int Option to have same content in <tfoot> and <thead> */
+        TFOOT_EQUALS_THEAD = 1<<1,
+        /**
+         * @var int Default option, the <tfoot> will be cloned from the <thead>
+         *          if the number of rows exceeds the number of rows given in
+         *          the constructor.
+         */
+        AUTO_TFOOT = 1<<2,
+        /** @var int Option to have the first cell of each row as <th> and not <td> */
+        ROWED = 1<<3;
+
 
     /**
      * @param array $attr The attributes of the table
+     * @param int $options A bitmask of one or more of the options above
+     * @param int $autoRows The number of rows to display the <tfoot> if the auto option is selected
      */
-    public function __construct(Document $dom)
+    public function __construct(Document $dom, $options = self::AUTO_TFOOT, $autoRows = 10)
     {
         parent::__construct($dom, 'table');
-    }
 
-    /**
-     * Initiates the DOM structure as soon as DOM can be modified
-     * @return self instance
-     */
-    protected function init()
-    {
         $this->tbody = parent::append($this->document->createElement('tbody'));
-        return $this;
+        $this->options = $options;
+        $this->autoRows = $autoRows;
     }
 
     /**
@@ -63,7 +70,25 @@ class Table extends HTMLElement
         } elseif (isset($this->caption)) {
             $this->caption->empty()->text($content);
         } else {
-            parent::prepend($this->document->createElement('caption'))->text($content);
+            $this->caption = parent::prepend($this->document->createElement('caption'))->text($content);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return boolean Returns if the <tfoot> is supposed to be cloned from <thead>
+     */
+    protected function autoTFoot()
+    {
+        if (
+            ($this->options & self::AUTO_TFOOT && $this->childNodes->length > $this->autoRows) ||
+            $this->options & self::TFOOT_EQUALS_THEAD
+        ) {
+            $tfoot = $this->getTFoot()->empty();
+            foreach ($this->thead->childNodes as $child) {
+                $tfoot->append($child->cloneNode(true));
+            }
         }
     }
 
@@ -75,6 +100,9 @@ class Table extends HTMLElement
     {
         if ($this->thead === null) {
             $this->thead = parent::prepend($this->document->createElement('thead'));
+            if (isset($this->caption)) {
+                $this->getDOMElement()->insertBefore($this->caption, $this->thead);
+            }
         }
 
         return $this->thead;
@@ -92,6 +120,7 @@ class Table extends HTMLElement
         foreach ($th as $value) {
             $theadRow->th()->text($value);
         }
+        $this->autoTFoot();
 
         return $this;
     }
@@ -106,6 +135,9 @@ class Table extends HTMLElement
         $this->getTHead()->empty()->tr()->append(array_map(function ($value) {
             return new HTMLElement($this->document, 'th', $value);
         }, $th));
+
+
+        $this->autoTFoot();
 
         return $this;
     }
@@ -174,7 +206,7 @@ class Table extends HTMLElement
 
             case 1:
                 $newLine = $this->tbody->tr();
-                
+
                 if (is_array($line)) {
                     foreach ($line as $content) {
                         if (is_array($content)) {
@@ -196,7 +228,7 @@ class Table extends HTMLElement
                             case 'th':
                                 $newLine->append($lineElem);
                                 break;
-                            
+
                             default:
                                 $newLine->td()->text($lineElem);
                                 break;
@@ -205,6 +237,10 @@ class Table extends HTMLElement
                 }
                 if(!$newLine->getDOMElement()->hasChildNodes()) {
                     $newLine->remove();
+                }
+
+                if ($this->options === self::AUTO_TFOOT) {
+                    $this->autoTFoot();
                 }
                 break;
 
