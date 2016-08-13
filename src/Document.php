@@ -24,11 +24,14 @@ class Document extends HTMLPage
     /** @var string The HTML language that will be output this document */
     protected $outputLanguage;
 
-    /** @var DOMElement The html object of the document */
+    /** @var \DOMElement The html object of the document */
     protected $html;
 
     /** @var BodyElement The body object of the document */
     protected $body;
+
+    /** @var \DOMDocumentFragment Some fragment to create the elements */
+    protected $fragment;
 
     protected $css_sheets = array();
     protected $scripts = array();
@@ -66,6 +69,19 @@ class Document extends HTMLPage
     public function __invoke()
     {
         return $this->body;
+    }
+
+    /**
+     * Returns a document fragment
+     * @return \DOMDocumentFragment
+     */
+    public function getFragment()
+    {
+        if (!isset($this->fragment)) {
+            $this->fragment = $this->getDOMDocument()->createDocumentFragment();
+        }
+
+        return $this->fragment;
     }
 
     /**

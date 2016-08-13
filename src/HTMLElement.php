@@ -18,8 +18,12 @@ use \Wa72\HtmlPageDom\HtmlPageCrawler;
  */
 class HTMLElement extends DOMElement implements ArrayAccess
 {
+    /** @var Document The owner document of this element */
 	protected $document;
-	protected $DOMElement;
+
+    // protected $DOMElement;
+
+    /** @var \DOMNode The parent node of this element */
 	protected $parentElement;
 
 	public function __construct(Document $dom, $tagName, $rawContent = '')
@@ -27,10 +31,12 @@ class HTMLElement extends DOMElement implements ArrayAccess
 		parent::__construct($tagName);
 
 		$this->document = $dom;
-        $this->document->getDOMDocument()->importNode($this);
-        HtmlPageCrawler::create($rawContent)->appendTo($this);
-        // $this->DOMElement = $this->getDOMDocument()->createElement($tagName);
-        // $dom->getDOMDocument()->importNode($this->getDOMElement());
+        $dom->getFragment()->appendChild($this);
+
+        if (!empty($rawContent)) {
+            $this->append($rawContent);
+        }
+        // $this->DOMElement = $this->getDOMDocument()->importNode($this);
 	}
 
 	/**
@@ -69,7 +75,21 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
 					return $return;
 				} else {
-					HtmlPageCrawler::create($elem)->appendTo($this);
+                    if (empty($elem)) {
+                        return $this;
+                    } elseif ($this->ownerDocument === null) {
+                        $doc = $this->document->getDOMDocument();
+                        $docFrag = $doc->createDocumentFragment();
+                        HtmlPageCrawler::create(
+                            $docFrag->appendChild($doc->createElement($this->getDOMElement()->nodeName))
+                        )->append($elem);
+                        foreach ($docFrag->childNodes as $child) {
+                            $this->getDOMElement()->appendChild($child);
+                        }
+                    } else {
+    					HtmlPageCrawler::create($this)->append($elem);
+                    }
+
                     return $this->lastChild;
 				}
 				break;
@@ -109,7 +129,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
     /**
      * Affiliates an element to this object
-     * @param  \DOMNode 
+     * @param  \DOMNode
      * @return \DOMNode
      */
     protected function affiliate($elem)

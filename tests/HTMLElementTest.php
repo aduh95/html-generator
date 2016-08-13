@@ -169,10 +169,10 @@ class HTMLElementTest extends TestCase
     public function testAppendHTMLString($HTML)
     {
         $element = $HTML->append('<p></p>');
-        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
-        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
+        $this->assertInstanceOf('DOMElement', $element);
+        $this->assertTrue($HTML->hasChildNodes());
         $this->assertSame('/p', strrchr($element->getNodePath(), '/'));
-        $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->lastChild);
+        $this->assertSame($element, $HTML->lastChild);
     }
 
     /**
