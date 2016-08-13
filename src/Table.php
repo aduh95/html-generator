@@ -82,7 +82,7 @@ class Table extends HTMLElement
     protected function autoTFoot()
     {
         if (
-            ($this->options & self::AUTO_TFOOT && $this->childNodes->length > $this->autoRows) ||
+            ($this->options & self::AUTO_TFOOT && $this->tbody->childNodes->length > $this->autoRows) ||
             $this->options & self::TFOOT_EQUALS_THEAD
         ) {
             $tfoot = $this->getTFoot()->empty();
@@ -239,7 +239,7 @@ class Table extends HTMLElement
                     $newLine->remove();
                 }
 
-                if ($this->options === self::AUTO_TFOOT) {
+                if ($this->options & self::AUTO_TFOOT) {
                     $this->autoTFoot();
                 }
                 break;
