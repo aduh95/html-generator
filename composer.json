@@ -1,8 +1,18 @@
 {
-	"name": "aduh95/HTMLGenerator",
-	"description": "HTML generator in PHP",
+	"name": "aduh95/html-generator",
+	"description": "HTML generator in PHP, implementing most of the jQuery DOM manipulation API",
 	"keywords": ["php", "html", "dom", "generator", "jquery"],
-	"authors": [{"name": "Antoine du HAMEL", "email": "duhamelantoine1995@gmail.com"}],
+	"authors": [
+		{
+			"name": "Antoine du HAMEL",
+			"email": "duhamelantoine1995@gmail.com"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/aduh95/html-generator/issues",
+		"wiki": "https://github.com/aduh95/html-generator/wiki",
+		"source": "https://github.com/aduh95/html-generator/releases"
+	},
 	"autoload": {
 		"psr-4": {
 			"aduh95\\HTMLGenerator\\": "src/"
