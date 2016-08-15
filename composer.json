@@ -18,8 +18,9 @@
 			"aduh95\\HTMLGenerator\\": "src/"
 		}
 	},
-	"require": {
-		"wa72/htmlpagedom": "^1.2"
+	"suggest": {
+		"wa72/htmlpagedom": "To add some more jQuery implementation in PHP",
+        "wa72/html-pretty-min": "Minify or indent HTML documents"
 	},
 	"autoload-dev": {
 		"psr-4": {
