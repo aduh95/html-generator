@@ -11,7 +11,7 @@ namespace aduh95\HTMLGenerator;
  * @author aduh95
  * @api
  */
-class BodyElement extends HTMLElement
+class Body extends HTMLElement
 {
 	public function __construct(Document $dom)
 	{

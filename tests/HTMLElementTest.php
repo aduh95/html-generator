@@ -52,6 +52,7 @@ class HTMLElementTest extends TestCase
      */
     public function testAddingText($div)
     {
+        $div->empty();
         $this->assertFalse($div->getDOMElement()->hasChildNodes());
         $div->text('test');
         $this->assertTrue($div->getDOMElement()->hasChildNodes());

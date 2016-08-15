@@ -8,7 +8,6 @@ namespace aduh95\HTMLGenerator;
 
 use DOMImplementation;
 
-use Wa72\HtmlPageDom\HTMLPage;
 use Wa72\HtmlPageDom\HtmlPageCrawler;
 
 /**
@@ -16,39 +15,56 @@ use Wa72\HtmlPageDom\HtmlPageCrawler;
  * @author aduh95
  * @api
  */
-class Document extends HTMLPage
+class Document
 {
     /** @var \DOMImplementation The DOM implementation for this document */
     protected $DOMImplementation;
 
+    /** @var \DOMDocument The actual DOM document for this document */
+    protected $dom;
+
     /** @var string The HTML language that will be output this document */
     protected $outputLanguage;
+
+    /** @var string The character set of encoding for this document */
+    protected $charset;
 
     /** @var \DOMElement The html object of the document */
     protected $html;
 
-    /** @var BodyElement The body object of the document */
+    /** @var Body The body object of the document */
     protected $body;
+
+    /** @var Head The head object of the document */
+    protected $head;
 
     /** @var \DOMDocumentFragment Some fragment to create the elements */
     protected $fragment;
 
+    /** @var Parser The parser to parse XML into this document */
+    protected $parser;
+
     protected $css_sheets = array();
     protected $scripts = array();
 
-    public function __construct($title = '', $lang = 'en', $language = ENT_HTML5)
+    public function __construct($title = '', $lang = 'en', $language = ENT_HTML5, $charset = 'UTF-8')
     {
         $this->outputLanguage = $language;
-        parent::__construct();
 
         $this->DOMImplementation = new DOMImplementation;
-        $this->dom = $this->DOMImplementation->createDocument(null, 'html', $this->getDoctype());
+        $this->dom = $this->DOMImplementation->createDocument();
+
+
+        $this->parser = new Parser($this, $charset, $language);
+        $this->dom->loadXML($this->parser->getHeaders().'<html/>');
+
         $this->html = $this->dom->documentElement;
-
-        $this->body = $this->html->appendChild(new BodyElement($this));
-
-        $this->setTitle($title);
         $this->html->setAttribute('lang', $lang);
+
+        $this->head = $this->html->appendChild(new Head($this));
+        $this->body = $this->html->appendChild(new Body($this));
+
+        $this->head->title()->text($title);
 
         // $this->getDOMDocument()->formatOutput = true;
     }
@@ -64,11 +80,27 @@ class Document extends HTMLPage
     }
 
     /**
-     * @return BodyElement The body element of this document
+     * @return Body The body element of this document
      */
     public function __invoke()
     {
         return $this->body;
+    }
+
+    /**
+     * @return Body The body element of this document
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * @return Head The Head element of this document
+     */
+    public function getHead()
+    {
+        return $this->head;
     }
 
     /**
@@ -146,20 +178,18 @@ class Document extends HTMLPage
         }
     }
 
-    public function createElement($tagName)
+    public function createElement($tagName, $rawContent = '')
     {
-        return new HTMLElement($this, $tagName);
+        return new HTMLElement($this, $tagName, $rawContent);
     }
 
     public function __toString()
     {
-        // $dom->documentElement->appendChild($this->getDocumentHead());
-        // $dom->documentElement->appendChild($this->getDocumentBody());
         return $this->dom->saveHTML();
-        // return .PHP_EOL.new Tag(
-        //     'html',
-        //     $this->attributes,
-        //     .$this->getDocumentBody()
-        // );
+    }
+
+    public function getDOMDocument()
+    {
+        return $this->dom;
     }
 }

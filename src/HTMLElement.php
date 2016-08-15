@@ -26,15 +26,26 @@ class HTMLElement extends DOMElement implements ArrayAccess
     /** @var \DOMNode The parent node of this element */
 	protected $parentElement;
 
+    /**
+     * Object constructor
+     * @param \aduh95\HTMLGenerator\Document $dom The Document object which owns this element
+     * @param string $tagName The tag name of this element
+     * @param string $rawContent The raw content of this element. If it is not XML valid, it will raise an error
+     * @throws \DOMException If the raw content is not valid
+     */
 	public function __construct(Document $dom, $tagName, $rawContent = '')
 	{
+        $deepRawContent = !empty($rawContent) && strpos($rawContent, '<')!==false;
+
 		parent::__construct($tagName);
 
 		$this->document = $dom;
         $dom->getFragment()->appendChild($this);
 
-        if (!empty($rawContent)) {
+        if ($deepRawContent) {
             $this->append($rawContent);
+        } else {
+            $this->nodeValue = $rawContent;
         }
         // $this->DOMElement = $this->getDOMDocument()->importNode($this);
 	}

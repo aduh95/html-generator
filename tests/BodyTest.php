@@ -9,35 +9,35 @@ namespace aduh95\HTMLGenerator\tests;
 use PHPUnit\Framework\TestCase;
 
 use aduh95\HTMLGenerator\Document;
-use aduh95\HTMLGenerator\BodyElement;
+use aduh95\HTMLGenerator\Body;
 
 
 /**
- * Test class for \aduh95\HTMLGenerator\BodyElement
+ * Test class for \aduh95\HTMLGenerator\Body
  * * @link http://phpunit.de/manual/
  */
-class BodyElementTest extends TestCase
+class BodyTest extends TestCase
 {
     /**
-     * @covers \aduh95\HTMLGenerator\BodyElement::__construct
+     * @covers \aduh95\HTMLGenerator\Body::__construct
      */
     public function testObjectConstructor()
     {
-        $return = new BodyElement(new Document);
+        $return = new Body(new Document);
 
-        $this->assertInstanceOf('aduh95\HTMLGenerator\BodyElement', $return);
+        $this->assertInstanceOf('aduh95\HTMLGenerator\Body', $return);
         $this->assertInstanceOf('DOMElement', $return);
 
         return $return;
     }
 
     /**
-     * @covers \aduh95\HTMLGenerator\BodyElement::__invoke
+     * @covers \aduh95\HTMLGenerator\Body::__invoke
      * @depends testObjectConstructor
      */
     public function testInvokeObjectToGetItself($body)
     {
-        $this->assertInstanceOf('aduh95\HTMLGenerator\BodyElement', $body());
+        $this->assertInstanceOf('aduh95\HTMLGenerator\Body', $body());
         $this->assertSame($body, $body());
     }
 }

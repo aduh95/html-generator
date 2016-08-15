@@ -67,7 +67,7 @@ class DocumentTest extends TestCase
         $return = array();
 
         $return[0]= [new Document, Document\HEAD_MODIFIED_HTML];
-        $return[0][0]->getHeadNode()->appendChild($return[0][0]->createElement('meta'))['charset'] = 'uft&amp;8';
+        $return[0][0]->getHead()->appendChild($return[0][0]->createElement('meta'))['charset'] = 'uft&amp;8';
 
         $return[1]= [new Document, Document\BODY_MODIFIED_HTML];
         $return[1][0]()->text('Tes&t');
@@ -82,7 +82,7 @@ class DocumentTest extends TestCase
     public function testInvokeObjectToGetBodyElement($document)
     {
         $body = $document();
-        $this->assertInstanceOf('aduh95\HTMLGenerator\BodyElement', $body);
+        $this->assertInstanceOf('aduh95\HTMLGenerator\Body', $body);
 
         return $body;
     }
