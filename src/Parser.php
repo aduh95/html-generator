@@ -37,7 +37,7 @@ class Parser
     public function parse($content)
     {
         if (is_string($content)) {
-            return $this->parseXML($content);
+            return $this->isXML($content) ? $this->parseXML($content) : $this->document->createCDataSection($content);
         } elseif (!is_object($content)) {
             return $this->document->createTextNode(strval($content));
         } elseif ($content instanceof DOMElement) {
@@ -53,6 +53,18 @@ class Parser
         } else {
             return new EmptyElement;
         }
+    }
+
+    /**
+     * Tells if the string is valid XML to be parsed
+     * @param string $content A string containing code to parse
+     * @return boolean The result of the test
+     */
+    public function isXML($content)
+    {
+        libxml_use_internal_errors(true);
+
+        return simplexml_load_string($this->getHeaders().'<root>'.$content.'</root>') !== false;
     }
 
     /**

@@ -63,8 +63,6 @@ class Document
         $this->body = $this->html->appendChild(new Body($this));
 
         $this->head->title()->text($title);
-
-        // $this->getDOMDocument()->formatOutput = true;
     }
 
     /**
