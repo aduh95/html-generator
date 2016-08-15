@@ -8,8 +8,6 @@ namespace aduh95\HTMLGenerator;
 
 use DOMImplementation;
 
-use Wa72\HtmlPageDom\HtmlPageCrawler;
-
 /**
  * Represents a whole HTML document
  * @author aduh95
@@ -18,7 +16,7 @@ use Wa72\HtmlPageDom\HtmlPageCrawler;
 class Document
 {
     /** @var \DOMImplementation The DOM implementation for this document */
-    protected $DOMImplementation;
+    public $DOMImplementation;
 
     /** @var \DOMDocument The actual DOM document for this document */
     protected $dom;
@@ -42,7 +40,7 @@ class Document
     protected $fragment;
 
     /** @var Parser The parser to parse XML into this document */
-    protected $parser;
+    public $parser;
 
     protected $css_sheets = array();
     protected $scripts = array();
@@ -55,7 +53,7 @@ class Document
         $this->dom = $this->DOMImplementation->createDocument();
 
 
-        $this->parser = new Parser($this, $charset, $language);
+        $this->parser = new Parser($this->dom, $charset, $language);
         $this->dom->loadXML($this->parser->getHeaders().'<html/>');
 
         $this->html = $this->dom->documentElement;

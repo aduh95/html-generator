@@ -9,7 +9,6 @@ namespace aduh95\HTMLGenerator;
 use ArrayAccess;
 use DOMNode;
 use DOMElement;
-use \Wa72\HtmlPageDom\HtmlPageCrawler;
 
 /**
  * Represents any HTML element
@@ -20,8 +19,6 @@ class HTMLElement extends DOMElement implements ArrayAccess
 {
     /** @var Document The owner document of this element */
 	protected $document;
-
-    // protected $DOMElement;
 
     /** @var \DOMNode The parent node of this element */
 	protected $parentElement;
@@ -47,7 +44,6 @@ class HTMLElement extends DOMElement implements ArrayAccess
         } else {
             $this->nodeValue = $rawContent;
         }
-        // $this->DOMElement = $this->getDOMDocument()->importNode($this);
 	}
 
 	/**
@@ -74,31 +70,23 @@ class HTMLElement extends DOMElement implements ArrayAccess
 	{
 		switch (func_num_args()) {
 			case 0:
-				return new EmptyElement($this);
+				return $this->append(new EmptyElement);
 				break;
 
 			case 1:
-				if (is_object($elem) && $elem instanceof self) {
-                    if (!($elem instanceof EmptyElement)) {
-					   $return = $this->getDOMElement()->appendChild($elem);
-                    }
+				if (is_object($elem) && $elem instanceof DOMNode) {
+
+                    $return = $elem instanceof EmptyElement ? $elem : $this->getDOMElement()->appendChild($elem);
                     $this->affiliate($return);
 
 					return $return;
+                } elseif (is_array($elem)) {
+                    return array_map([$this, __METHOD__], $elem);
 				} else {
                     if (empty($elem)) {
                         return $this;
-                    } elseif ($this->ownerDocument === null) {
-                        $doc = $this->document->getDOMDocument();
-                        $docFrag = $doc->createDocumentFragment();
-                        HtmlPageCrawler::create(
-                            $docFrag->appendChild($doc->createElement($this->getDOMElement()->nodeName))
-                        )->append($elem);
-                        foreach ($docFrag->childNodes as $child) {
-                            $this->getDOMElement()->appendChild($child);
-                        }
                     } else {
-    					HtmlPageCrawler::create($this)->append($elem);
+                        return $this->getDOMElement()->appendChild($this->document->parser->parse($elem));
                     }
 
                     return $this->lastChild;
@@ -106,16 +94,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
 				break;
 
 			default:
-				foreach (func_get_args() as $element) {
-					if (is_string($element)) {
-						if (strncmp($element, '<', 1)) {
-							$this->text($element);
-						} else {
-							$this->append($element);
-						}
-					}
-				}
-				return $this;
+				return array_map([$this, __METHOD__], func_get_args());
 				break;
 		}
 	}
@@ -145,7 +124,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
     protected function affiliate($elem)
     {
-        if ($elem instanceof self) {
+        if ($elem instanceof self || $elem instanceof EmptyElement) {
             $elem->parentElement = $this;
         }
 
@@ -285,6 +264,12 @@ class HTMLElement extends DOMElement implements ArrayAccess
         }
     }
 
+    /**
+     * Appends an HTMLElement at the end of this document
+     * @param string $tagName The tag name of the new element
+     * @param mixed[] $content The attributes and the raw XML content
+     * @return self The new element
+     */
     public function __call($tagName, $content)
     {
     	$tag = $this->append(new self($this->document, $tagName));
@@ -295,9 +280,12 @@ class HTMLElement extends DOMElement implements ArrayAccess
     	return $tag;
     }
 
+    /**
+     * @return self Alias for parent
+     */
     public function __invoke()
     {
-    	return $this->getDOMElement()->parent();
+    	return $this->parent();
     }
 
     /**
@@ -305,7 +293,9 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
 	public function __toString()
 	{
-		return HtmlPageCrawler::create($this->getDOMElement())->saveHTML();
+        $document = new \DOMDocument;
+        $document->appendChild($document->importNode($this->getDOMElement(), true));
+		return $document->saveHTML();
 	}
 
     /**

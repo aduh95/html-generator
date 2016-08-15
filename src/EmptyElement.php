@@ -5,23 +5,15 @@
  */
 
 namespace aduh95\HTMLGenerator;
-
+use DOMNode;
 
 /**
  * Represents an empty element
  * @author aduh95
  */
-class EmptyElement
+class EmptyElement extends DOMNode
 {
-    public $parentNode;
-
-    /**
-     * @param HTMLElement|null $parent The parent node of this element
-     */
-    public function __construct(HTMLElement $parent = null)
-    {
-        $this->parentNode = $parent;
-    }
+    public $parentElement;
 
     /**
      * Does not contain any DOMElement
@@ -29,7 +21,7 @@ class EmptyElement
      */
     public function __invoke()
     {
-        return $this->parentNode;
+        return $this->parentElement;
     }
 
     /**

@@ -21,30 +21,51 @@ class Parser
     public $entities;
 
     /** @var \DOMDocument The document to perform the parsing */
-    protected static $document;
+    protected $document;
 
     public function __construct($document, $charset, $outputLanguage)
     {
+        $this->document = $document;
         $this->charset = $charset;
         $this->outputLanguage = $outputLanguage;
     }
 
     /**
+     * @param mixed $content The content to parse
+     * @return \DOMNode
+     */
+    public function parse($content)
+    {
+        if (is_string($content)) {
+            return $this->parseXML($content);
+        } elseif (!is_object($content)) {
+            return $this->document->createTextNode(strval($content));
+        } elseif ($content instanceof DOMElement) {
+            return $content;
+        } elseif ($content instanceof DOMNodeList) {
+            $fragment = $document->createDocumentFragment();
+
+            foreach ($content as $child) {
+                $fragment->appendChild($document->importNode($child, true));
+            }
+
+            return $fragment;
+        } else {
+            return new EmptyElement;
+        }
+    }
+
+    /**
      * Returns the child nodes equivalent to the XHTML string passed as parameter
      * @param string $xhtml The xHTML string (has to be valid XML)
-     * @return \DOMNodeList
+     * @return \DOMDocumentFragment
      */
-    public static function parseXML($value = '')
+    public function parseXML($value = '')
     {
-        $document = self::getDocument();
-        $frag = $document->createDocumentFragment();
-        $frag->appendXML('<root>'.$value.'</root>');
+        $fragment = $this->document->createDocumentFragment();
+        $fragment->appendXML($value);
 
-        // var_dump(self::getHeaders().'<root>'.$value.'</root>');
-        $document->appendChild($frag);//, LIBXML_NOENT | LIBXML_NOWARNING | LIBXML_NOERROR);
-        var_dump(self::$document->saveHTML());
-
-        return $document->lastChild->childNodes;
+        return $fragment;
     }
 
     protected static function getDocument()
