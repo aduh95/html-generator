@@ -32,4 +32,9 @@ class EmptyElement extends DOMNode
     {
         return null;
     }
+
+    public function is($tagName)
+    {
+        return false;
+    }
 }

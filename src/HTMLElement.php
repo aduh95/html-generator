@@ -24,6 +24,27 @@ class HTMLElement extends DOMElement implements ArrayAccess
 	protected $parentElement;
 
     /**
+     * Replaces the elements by actual HTMLElement
+     * @param \DOMElement|self $element
+     * @return self An instance of this element
+     */
+    public static function create($element)
+    {
+        if ($element instanceof self) {
+            return $element;
+        } elseif ($element instanceof DOMElement) {
+            return (new self(
+                Document::create($element->ownerDocument),
+                $element->nodeName,
+                $element->nodeValue
+            ))->replace($element);
+        } else {
+            return new EmptyElement;
+        }
+
+    }
+
+    /**
      * Object constructor
      * @param \aduh95\HTMLGenerator\Document $dom The Document object which owns this element
      * @param string $tagName The tag name of this element
@@ -313,6 +334,33 @@ class HTMLElement extends DOMElement implements ArrayAccess
     public function remove()
     {
         $this->parent()->getDOMElement()->removeChild($this);
+    }
+
+    /**
+     * Tells if the node name of this element is
+     * @param string $nodeName The node name to test
+     * @return boolean
+     */
+    public function is($nodeName)
+    {
+        return !strcasecmp($this->getDOMElement()->nodeName, $nodeName);
+    }
+
+    /**
+     * Replaces the node in argument by this element if possible
+     * @param \DOMNode $element The node to be replaced
+     * @return self instance
+     */
+    public function replace($element)
+    {
+        if ($element instanceof DOMNode && isset($element->parentNode)) {
+            $element->parentNode->replaceChild(
+                $element->ownerDocument->importNode($this),
+                $element
+            );
+        }
+
+        return $this;
     }
 
     /**

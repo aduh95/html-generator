@@ -11,19 +11,10 @@ namespace aduh95\HTMLGenerator;
  * @author aduh95
  * @api
  */
-class Body extends HTMLElement
+class Body extends SubRootElement
 {
 	public function __construct(Document $dom)
 	{
 		parent::__construct($dom, 'body');
-        $this->parentElement = $dom->getDOMDocument()->documentElement;
 	}
-
-    /**
-     * @return self Return the current object
-     */
-    public function __invoke()
-    {
-        return $this;
-    }
 }

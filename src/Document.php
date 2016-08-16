@@ -42,11 +42,16 @@ class Document
     /** @var Parser The parser to parse XML into this document */
     public $parser;
 
+    /** @var Document The last Document instance created */
+    protected static $lastDocument;
+
     protected $css_sheets = array();
     protected $scripts = array();
 
     public function __construct($title = '', $lang = 'en', $language = ENT_HTML5, $charset = 'UTF-8')
     {
+        self::$lastDocument = $this;
+
         $this->outputLanguage = $language;
 
         $this->DOMImplementation = new DOMImplementation;
@@ -187,5 +192,17 @@ class Document
     public function getDOMDocument()
     {
         return $this->dom;
+    }
+
+    public static function create($DOMDocument = null)
+    {
+        if (is_object($DOMDocument) && $DOMDocument instanceof \DOMDocument) {
+            $return = new self;
+            $return->dom = $DOMDocument;
+
+            return $return;
+        } else {
+            return self::$lastDocument ?: new self;
+        }
     }
 }
