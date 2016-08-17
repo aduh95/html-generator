@@ -6,6 +6,7 @@
 
 namespace aduh95\HTMLGenerator;
 
+use DOMXPath;
 use DOMDocument;
 
 /**
@@ -23,11 +24,17 @@ class Parser
     /** @var \DOMDocument The document to perform the parsing */
     protected $document;
 
+    /**
+     * @param \DOMDocument $document
+     * @param string $charset
+     * @param int $outputLanguage
+     */
     public function __construct($document, $charset, $outputLanguage)
     {
         $this->document = $document;
         $this->charset = $charset;
         $this->outputLanguage = $outputLanguage;
+        // $this->xpath = new DOMXPath($document);
     }
 
     /**
@@ -153,5 +160,17 @@ class Parser
         }
 
         return $this->entities;
+    }
+
+    public function xPath($xPathQuery, $nodeContext = null)
+    {
+        if (empty($nodeContext)) {
+            $nodeContext = $this->document->documentElement;
+            $xpath = new DOMXPath($this->document);
+        } else {
+            $xpath = new DOMXPath($nodeContext->ownerDocument);
+        }
+
+        return $xpath->query($xPathQuery, $nodeContext);
     }
 }
