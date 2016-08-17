@@ -199,6 +199,7 @@ class Document
         if (is_object($DOMDocument) && $DOMDocument instanceof \DOMDocument) {
             $return = new self;
             $return->dom = $DOMDocument;
+            $return->fragment = $DOMDocument->createDocumentFragment();
 
             return $return;
         } else {
