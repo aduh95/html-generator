@@ -87,16 +87,6 @@ class Parser
         return $fragment;
     }
 
-    protected static function getDocument()
-    {
-        if (!isset(self::$document)) {
-            self::$document = new DOMDocument;
-            self::$document->loadXML(self::getHeaders().'<xml></xml>');
-        }
-
-        return self::$document;
-    }
-
     public function getHeaders()
     {
         return '<?xml version="1.0" encoding="'.$this->charset.'"?>'.PHP_EOL.$this->getDoctype().PHP_EOL;
@@ -150,11 +140,13 @@ class Parser
     {
         if(!isset($this->entities)) {
             $this->entities = array();
-            foreach (array_diff(
-                get_html_translation_table(HTML_ENTITIES, $this->outputLanguage | ENT_NOQUOTES, $this->charset),
-                get_html_translation_table(HTML_ENTITIES, ENT_XML1 | ENT_NOQUOTES, $this->charset),
-                ['&percnt;']
-            ) as $value => $entity) {
+            foreach (
+                array_diff(
+                    get_html_translation_table(HTML_ENTITIES, $this->outputLanguage | ENT_NOQUOTES, $this->charset),
+                    get_html_translation_table(HTML_ENTITIES, ENT_XML1 | ENT_NOQUOTES, $this->charset),
+                    ['&percnt;']
+                ) as $value => $entity
+            ) {
                  $this->entities[substr($entity, 1, -1)] = $value;
             }
         }
