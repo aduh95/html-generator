@@ -28,23 +28,27 @@ class Head extends SubRootElement
     {
         $metaElement = $this->getMetaElement($name);
         if (func_num_args() === 1) {
-            return $metaElement['content'] ?: null;
+            return is_array($name) ? parent::meta($name) : ($metaElement ? $metaElement['content'] : null);
         } else {
+            if (!isset($metaElement)) {
+                $metaElement = parent::meta(['name'=>$name]);
+            }
             $metaElement['content'] = $content;
         }
 
         return $this;
     }
 
+    public function removeMeta($name)
+    {
+        $this->removeChild($this->getMetaElement($name));
+        return $this;
+    }
+
     protected function getMetaElement($name)
     {
-        foreach ($this->childNodes as $child) {
-            $childElement = HTMLElement::create($child);
-            if($childElement->is('meta') && $childElement['name'] === $name) {
-                return $childElement;
-            }
-        }
+        $return = $this->find('meta[@name="'.str_replace('"', '\"', $name).'"]');
 
-        return parent::meta()->attr('name', $name);
+        return $return->length ? HTMLElement::create($return->item(0)) : null;
     }
 }

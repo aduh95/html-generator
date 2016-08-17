@@ -54,7 +54,9 @@ class Table extends HTMLElement
     {
         parent::__construct($dom, 'table');
 
-        $this->tbody = parent::append($this->document->createElement('tbody'));
+        $this->tbody = $this->document->createElement('tbody');
+        parent::append($this->tbody);
+
         $this->options = $options;
         $this->autoRows = $autoRows;
     }

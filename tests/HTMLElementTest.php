@@ -66,11 +66,17 @@ class HTMLElementTest extends TestCase
     {
         $attrName = 'test';
         $attrValue = 'value';
+        $attrValue2 = 'value2';
 
         $this->assertFalse($div->getDOMElement()->hasAttribute($attrName));
         $div->attr($attrName, $attrValue);
-        $this->assertTrue($div->getDOMElement()->hasAttribute($attrName));
-        $this->assertSame($div->getDOMElement()->getAttribute($attrName), $attrValue);
+        $this->assertTrue($div->getDOMElement()->hasAttribute($attrName), 'The attribute hasn\'t been created');
+        $this->assertSame($div->getDOMElement()->getAttribute($attrName), $attrValue, 'The attribute\'s value is wrong');
+
+        // Test reset the value
+        $div->attr($attrName, $attrValue2);
+        $this->assertTrue($div->getDOMElement()->hasAttribute($attrName), 'The attribute has been deleted when modiying');
+        $this->assertSame($div->getDOMElement()->getAttribute($attrName), $attrValue2, 'The attribute\'s value hasn\'t been changed');
 
         return $attrName;
     }
@@ -143,11 +149,12 @@ class HTMLElementTest extends TestCase
     public function testAppendOneElement($HTML)
     {
         $tagName = 'someElement'.rand();
-        $element = $HTML->append($this->getDocument()->createElement($tagName));
-        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $element);
-        $this->assertTrue($HTML->getDOMElement()->hasChildNodes());
-        $this->assertStringEndsWith('/'.$tagName, $element->getNodePath());
-        $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->lastChild);
+        $length = $HTML->childNodes->length;
+
+        $HTML->append($this->getDocument()->createElement($tagName));
+        $this->assertTrue($HTML->hasChildNodes());
+        $this->assertStringEndsWith('/'.$tagName, $HTML->lastChild->getNodePath());
+        $this->assertSame($HTML->childNodes->length, $length + 1);
     }
 
     /**
@@ -169,11 +176,10 @@ class HTMLElementTest extends TestCase
      */
     public function testAppendHTMLString($HTML)
     {
-        $element = $HTML->append('<p></p>');
-        $this->assertInstanceOf('DOMElement', $element);
+        $HTML->append('<p></p>');
+
         $this->assertTrue($HTML->hasChildNodes());
-        $this->assertSame('/p', strrchr($element->getNodePath(), '/'));
-        $this->assertSame($element, $HTML->lastChild);
+        $this->assertStringEndsWith('/p', $HTML->lastChild->getNodePath());
     }
 
     /**

@@ -26,18 +26,34 @@ class HTMLElement extends DOMElement implements ArrayAccess
     /**
      * Replaces the elements by actual HTMLElement
      * @param \DOMElement|self $element
-     * @return self An instance of this element
+     * @return self|EmptyElement An instance of the converted element
      */
     public static function create($element)
     {
         if ($element instanceof self) {
             return $element;
         } elseif ($element instanceof DOMElement) {
+            $document = Document::create($element->ownerDocument);
+
+            $attr = array();
+            if ($element->hasAttributes()) {
+                foreach ($element->attributes as $attribute) {
+                    $attr[$attribute->name] = $attribute->value;
+                }
+            }
+            $content = array();
+            if ($element->hasChildNodes()) {
+                foreach ($element->childNodes as $child) {
+                    $content[] = $child->cloneNode(true);
+                }
+            }
+
             return (new self(
-                Document::create($element->ownerDocument),
+                $document,
                 $element->nodeName,
                 $element->nodeValue
-            ))->replace($element);
+            ))->attr($attr)->append($content)->replace($element);
+
         } else {
             return new EmptyElement;
         }
@@ -78,7 +94,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
             return $this->getDOMElement()->textContent;
         }
 
-		$this->getDOMElement()->appendChild($this->getDOMDocument()->createTextNode($text));
+		$this->append($this->getDOMDocument()->createTextNode($text));
 		return $this;
 	}
 
@@ -91,33 +107,36 @@ class HTMLElement extends DOMElement implements ArrayAccess
 	{
 		switch (func_num_args()) {
 			case 0:
-				return $this->append(new EmptyElement);
+                $return = new EmptyElement;
+				$this->append($return);
+                return $return;
 				break;
 
 			case 1:
-				if (is_object($elem) && $elem instanceof DOMNode) {
+                if (is_array($elem)) {
+                    array_map([$this, __METHOD__], $elem);
+                } elseif (is_object($elem) && $elem instanceof DOMNode) {
 
-                    $return = $elem instanceof EmptyElement ? $elem : $this->getDOMElement()->appendChild($elem);
+                    $return = $elem instanceof EmptyElement ?
+                        $elem :
+                        $this->getDOMElement()->appendChild(
+                            $elem->ownerDocument===$this->ownerDocument ?
+                                $elem :
+                                $this->ownerDocument->importNode($elem, true)
+                        );
                     $this->affiliate($return);
-
-					return $return;
-                } elseif (is_array($elem)) {
-                    return array_map([$this, __METHOD__], $elem);
 				} else {
-                    if (empty($elem)) {
-                        return $this;
-                    } else {
-                        return $this->getDOMElement()->appendChild($this->document->parser->parse($elem));
+                    if (!empty($elem)) {
+                        $this->getDOMElement()->appendChild($this->document->parser->parse($elem));
                     }
-
-                    return $this->lastChild;
 				}
 				break;
 
 			default:
-				return array_map([$this, __METHOD__], func_get_args());
+                return call_user_func([$this, __METHOD__], func_get_args());
 				break;
 		}
+        return $this;
 	}
 
     /**
@@ -293,12 +312,12 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
     public function __call($tagName, $content)
     {
-    	$tag = $this->append(new self($this->document, $tagName));
-    	if(count($content) && is_array($content[0])) {
-    		$tag->attr(array_shift($content));
-    	}
-    	$tag->append($content);
-    	return $tag;
+        $return = new self($this->document, $tagName);
+        $return
+            ->attr(count($content) && is_array($content[0]) ? array_shift($content) : array())
+            ->append($content);
+        $this->append($return);
+        return $return;
     }
 
     /**
@@ -325,15 +344,25 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
 	public function parent()
 	{
-		return $this->parentElement;
+		return $this->parentElement ?: $this->parentNode();
 	}
+
+    /**
+     * Finds an element in the children and descendents
+     * @param string $xPathQuery @see \DOMXPath::query
+     * @return \DOMNodeList The set of result(s)
+     */
+    public function find($xPathQuery)
+    {
+        return $this->document->parser->xPath($xPathQuery, $this);
+    }
 
     /**
      * Removes the current object of its parent's chil nodes
      */
     public function remove()
     {
-        $this->parent()->getDOMElement()->removeChild($this);
+        $this->parent()->removeChild($this);
     }
 
     /**
@@ -355,7 +384,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
     {
         if ($element instanceof DOMNode && isset($element->parentNode)) {
             $element->parentNode->replaceChild(
-                $element->ownerDocument->importNode($this),
+                $this,
                 $element
             );
         }
@@ -372,7 +401,9 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
     public function table($attr = array(), $options = Table::AUTO_TFOOT, $autoRows = 10)
     {
-        return $this->append(new Table($this->document, $options, $autoRows))->attr($attr);
+        $table = new Table($this->document, $options, $autoRows);
+        $this->append($table)->attr($attr);
+        return $table;
     }
 
 	public function getDOMElement()
