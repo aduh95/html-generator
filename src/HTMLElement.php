@@ -344,7 +344,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
      */
 	public function parent()
 	{
-		return $this->parentElement ?: $this->parentNode();
+		return $this->parentElement ?: $this->parentNode;
 	}
 
     /**
@@ -402,8 +402,52 @@ class HTMLElement extends DOMElement implements ArrayAccess
     public function table($attr = array(), $options = Table::AUTO_TFOOT, $autoRows = 10)
     {
         $table = new Table($this->document, $options, $autoRows);
-        $this->append($table)->attr($attr);
+        $this->append($table->attr($attr));
         return $table;
+    }
+
+    /**
+     * Creates a HTML <ul>
+     * This method has the following signature:
+     * List HTMLElement::ul([array $attributes,][array $listItems])
+     * @param array $attributes The attributes for the <ul> element
+     * @param string[]|HTMLElement[]|\DOMNodeList $listItems The items of the list
+     * @return \aduh95\HTMLGenerator\List The list object created
+     */
+    public function ul($attributes = array(), $listItems = array())
+    {
+        return $this->appendList('ul', $attributes, $listItems);
+    }
+
+    /**
+     * Creates a HTML <ol>
+     * This method has the following signature:
+     * List HTMLElement::ol([array $attributes,][array $listItems])
+     * @param array $attributes The attributes for the <ol> element
+     * @param string[]|HTMLElement[]|\DOMNodeList $listItems The items of the list
+     * @return \aduh95\HTMLGenerator\List The list object created
+     */
+    public function ol($attributes = array(), $listItems = array())
+    {
+        return $this->appendList('ol', $attributes, $listItems);
+    }
+
+    /**
+     * Creates a HTML list
+     * @param string $tagName
+     * @param array $attributes The attributes for the <ol> element
+     * @param string[]|HTMLElement[]|\DOMNodeList $listItems The items of the list
+     * @return \aduh95\HTMLGenerator\List The list object created
+     */
+    protected function appendList($tagName, $attributes = array(), $listItems = array())
+    {
+        if (is_object($attributes) || (count($attributes) && isset($attributes[0]))) {
+            $listItems = $attributes;
+            $attributes = array();
+        }
+        $list = new HTMLList($this->document, 'ol');
+        $this->append($list->attr($attributes)->append($listItems));
+        return $list;
     }
 
 	public function getDOMElement()

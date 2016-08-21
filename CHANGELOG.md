@@ -6,6 +6,8 @@ This file follows the [Keep A Changelog](http://keepachangelog.com/en/0.3.0/) pr
 This file is written using [Markdown syntax](http://daringfireball.net/projects/markdown/syntax).
 
 ## [Unreleased]
+### Added
+- The `HTMLList` class
 
 
 ## [0.2.0] - 2016-08-21

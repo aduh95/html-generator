@@ -6,6 +6,9 @@
 
 namespace aduh95\HTMLGenerator;
 
+use DOMElement;
+use DOMNodeList;
+
 /**
  * Represents a HTML table element
  * @author aduh95
@@ -46,7 +49,7 @@ class Table extends HTMLElement
 
 
     /**
-     * @param array $attr The attributes of the table
+     * @param \aduh95\HTMLGenerator\Document $dom The Document object which owns this element
      * @param int $options A bitmask of one or more of the options above
      * @param int $autoRows The number of rows to display the <tfoot> if the auto option is selected
      */
