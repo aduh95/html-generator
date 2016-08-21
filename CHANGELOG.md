@@ -6,6 +6,9 @@ This file follows the [Keep A Changelog](http://keepachangelog.com/en/0.3.0/) pr
 This file is written using [Markdown syntax](http://daringfireball.net/projects/markdown/syntax).
 
 ## [Unreleased]
+
+
+## [0.2.0] - 2016-08-21
 ### Added
 - HTML entities support
 - The string parsing now support non 'XML valid' strings (such as JS or CSS code)
