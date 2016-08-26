@@ -433,6 +433,118 @@ class HTMLElement extends DOMElement implements ArrayAccess
     }
 
     /**
+     * Creates a document fragment that contains a new input element
+     * @param array $attr The attributes of the input
+     * @return self The input element generated
+     */
+    public function input($attr = array(), $defaultValues = array())
+    {
+        $return = $this->ownerDocument->createDocumentFragment();
+
+        if (empty($attr['type'])) {
+            $attr['type'] = 'text';
+        }
+        $type = $attr['type'];
+
+
+        // Set the default value if exists
+        if (!array_key_exists('value', $attr) && isset($attr['name']) && isset($defaultValues[$attr['name']])) {
+            $attr['value'] = $defaultValues[$attr['name']];
+        }
+
+
+        switch ($type) {
+
+            case 'radio':
+            case 'checkbox':
+                $inputEmbeded = true;
+                break;
+         
+            case 'textarea':
+                $content = $this->document->createTextNode($attr['value']);
+                unset($attr['value']);
+                break;
+
+            default:
+                $inputEmbeded = false;
+                $attr['class'] = isset($attr['class']) ? $attr['class'] : 'form-control';
+                break;
+        }
+
+
+        // Gestion des élements exterieurs à l'input
+        $label=null; $help=null;
+        if (isset($attr['other'])) {
+            // 'other' n'est pas un attribut HTML
+            $opt = $attr['other'];
+            unset($attr['other']);
+
+            // Gestion des labels
+            $label= empty($opt['label']) ? false : $this->document->createTextNode($opt['label']);
+
+            // Gestion des options pour les <select> ou les <datalist>
+            if (isset($opt['options'])) {
+                $val = empty($attr['value']) ? array() : (is_array($attr['value']) ? $attr['value'] : [$attr['value']]);
+                $options=null;
+                foreach ($opt['options'] as $key => $value)
+                {
+                    // Gestion des <optgroup>
+                    if (is_array($value)) {
+                        $optgroup = '';
+                        foreach ($value as $subkey => $option) {
+                            $optgroup.=HTML::option(['selected'=>in_array($subkey, $val), 'value'=>$subkey], $option, true);
+                        }
+                        $options.=HTML::optgroup(['label'=>$key], $optgroup);
+                    } else {
+                        $options.=HTML::option(['selected'=>in_array($key, $val), 'value'=>$key], $value, true);
+                    }
+                }
+            }
+
+            // Gestion des help-boxes
+            if (isset($opt['help'])) {
+                $help = HTML::span(['class'=>'help-block'], $opt['help'], true);
+            }
+
+
+
+        // Génération d'un ID si besoin
+        if (($label||array_key_exists('list', $attr)) && !$option_input && !array_key_exists('id', $attr)) {
+            $attr['id'] = self::new_id();
+        }
+
+        // Gestion des datalist
+        if (isset($attr['list'])) {
+            $datalist = static::inputGenerate(['type'=>'datalist', 'other'=>['options'=>$attr['list']], 'id'=>$attr['list']=self::new_id(), 'class'=>'']);
+        } else {
+            $datalist=null;
+        }
+
+        // Gestion des inputs qui n'utilisent pas la balise HTML <input>
+        if (in_array($type, ['textarea', 'select', 'datalist'])) {
+            $val =  isset($options) ?
+                        $options :
+                (   isset($attr['value']) ?
+                        HTML::noXSS($attr['value']):
+                        null
+                );
+            unset($attr['value'], $attr['type'], $attr['other']);
+            $return = HTML::tag($type, $attr, $val);
+        } else {
+            $return = HTML::input($attr);
+        }
+
+        // Rajout du label - avant ou après l'élement suivant $option_input
+        if ($label) {
+            $return = $option_input ? HTML::label($return.' '.$label) : HTML::label(['for'=>$attr['id']], $label).$return;
+        }
+
+        $input = new self($this->document, $type === 'select' ? 'select' : 'input');
+        // On retourne le code HTML généré
+        return $return.$datalist.$help;
+    }
+
+    /**
      * Creates a HTML list
      * @param string $tagName
      * @param array $attributes The attributes for the <ol> element
