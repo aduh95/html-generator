@@ -84,4 +84,30 @@ class HeadTest extends TestCase
         $this->assertSame($count, $head->childNodes->length, 'The <meta> hasn\'t been removed');
         $this->assertNull($head->meta($metaName), 'The <meta> already exists');
     }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\Head::script
+     * @depends testDocumentCreateHead
+     */
+    public function testScriptAdding($head)
+    {
+        $head->script('//example.com/script.js');
+
+        $this->assertSame('script', $head->lastChild->tagName);
+        $this->assertTrue($head->lastChild->hasAttribute('src'));
+        $this->assertTrue($head->lastChild->hasAttribute('defer'));
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\Head::style
+     * @depends testDocumentCreateHead
+     */
+    public function testStyleAdding($head)
+    {
+        $head->style('//example.com/style.css');
+
+        $this->assertSame('link', $head->lastChild->tagName);
+        $this->assertTrue($head->lastChild->hasAttribute('rel'));
+        $this->assertTrue($head->lastChild->hasAttribute('heaf'));
+    }
 }

@@ -505,6 +505,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
             if (isset($opt['help'])) {
                 $help = HTML::span(['class'=>'help-block'], $opt['help'], true);
             }
+        }
 
 
 

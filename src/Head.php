@@ -51,4 +51,29 @@ class Head extends SubRootElement
 
         return $return->length ? HTMLElement::create($return->item(0)) : null;
     }
+
+    /**
+     * Attachs a script to the head element
+     * @param array|string $src The (absolute or relative) path to the source or an array of attributs
+     * @param boolean $defer Sets the HTML defer parameter
+     * 
+     * @return self instance
+     */
+    public function script($src, $defer = true)
+    {
+        parent::script(['src'=>$src, 'defer'=>$defer]);
+        return $this;
+    }
+
+    /**
+     * Attachs a style sheet to the head element
+     * @param array|string $href The (absolute or relative) path to the source or an array of attributs
+     * 
+     * @return self instance
+     */
+    public function style($href)
+    {
+        parent::link(['href'=>$href, 'rel'=>'stylesheet', 'type'=>"text/css"]);
+        return $this;
+    }
 }
