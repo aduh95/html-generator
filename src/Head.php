@@ -26,9 +26,14 @@ class Head extends SubRootElement
      */
     public function meta($name, $content = null)
     {
+        if (is_array($name)) {
+            // To get the default behaviour back if needed
+            return parent::meta($name);
+        }
+
         $metaElement = $this->getMetaElement($name);
         if (func_num_args() === 1) {
-            return is_array($name) ? parent::meta($name) : ($metaElement ? $metaElement['content'] : null);
+            return $metaElement ? $metaElement['content'] : null;
         } else {
             if (!isset($metaElement)) {
                 $metaElement = parent::meta(['name'=>$name]);
