@@ -558,7 +558,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
             $listItems = $attributes;
             $attributes = array();
         }
-        $list = new HTMLList($this->document, 'ol');
+        $list = new HTMLList($this->document, $tagName);
         $this->append($list->attr($attributes)->append($listItems));
         return $list;
     }
