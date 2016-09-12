@@ -433,13 +433,39 @@ class HTMLElement extends DOMElement implements ArrayAccess
     }
 
     /**
-     * Creates a document fragment that contains a new input element
-     * @param array $attr The attributes of the input
+     * Creates a HTML list
+     * @param string $tagName
+     * @param array $attributes The attributes for the <ol> element
+     * @param string[]|HTMLElement[]|\DOMNodeList $listItems The items of the list
+     * @return \aduh95\HTMLGenerator\List The list object created
+     */
+    protected function appendList($tagName, $attributes = array(), $listItems = array())
+    {
+        if (is_object($attributes) || (count($attributes) && isset($attributes[0]))) {
+            $listItems = $attributes;
+            $attributes = array();
+        }
+        $list = new HTMLList($this->document, $tagName);
+        $this->append($list->attr($attributes)->append($listItems));
+        return $list;
+    }
+
+    /**
+     * Creates a document fragment that contains a new {input, select, textarea} element.
+     * @param array $attr The attributes of the input.
+     *      You can also pass keys that won't be interpreted as attributes of the element:
+     *       - label: string (a <label> element will be created)
+     *       - help: string (a <div class="help-block"> element will be created)
+     *       - list: string [] (a <datalist> will be created)
+     *       - options: string [] (<option> elements will be created)
+     *      Please note that if you try to modify a non attribute key as ArrayAccess key, it will lead to unexpected results.
+     *      @exemple $input = $elem->input(['label'=>'Your name:']); // GOOD! This will output: <label>Your name:<input></label>
+     *      @exemple $input = $elem->input();$input['label'] = 'Your name:'; // WRONG! This will output: <input label="Your name;">
      * @return self The input element generated
      */
     public function input($attr = array(), $defaultValues = array())
     {
-        $return = $this->ownerDocument->createDocumentFragment();
+        $return = $this->div(['class'=>'form-group']);
 
         if (empty($attr['type'])) {
             $attr['type'] = 'text';
@@ -453,27 +479,58 @@ class HTMLElement extends DOMElement implements ArrayAccess
         }
 
 
-        switch ($type) {
-
-            case 'radio':
-            case 'checkbox':
-                $inputEmbeded = true;
-                break;
+        $attr['class'] = isset($attr['class']) ? $attr['class'] : 'form-control';
+        $inputEmbeded = $type==='radio' || $type==='checkbox';
          
-            case 'textarea':
-                $content = $this->document->createTextNode($attr['value']);
-                unset($attr['value']);
-                break;
-
-            default:
-                $inputEmbeded = false;
-                $attr['class'] = isset($attr['class']) ? $attr['class'] : 'form-control';
-                break;
+        if ($type==='textarea') {
+            $input = new self($this->document, 'textarea');
+            $input->text($attr['value']);
+            unset($attr['value']);
+        } elseif ($type==='select' || $type==='datalist') {
+            $input = new self($this->document, $type);
+        } else {
+            $input = new self($this->document, 'input');
         }
 
 
+
+        if (isset($attr['label'])) {
+            $label = $return->label();
+
+            if ($inputEmbeded) {
+                $label->append($input);
+            } else {
+                $return->append($input);
+            }
+
+            $label->text($attr['label']);
+            unset($attr['label']);
+        } else {
+            $return->append($input);
+        }
+
+        if (isset($attr['options'])) {
+            //
+        }
+
+        if (isset($attr['list']) && is_array($attr['list'])) {
+            //
+        }
+
+        if (isset($attr['help'])) {
+            $return->div(['class'=>'help-block'])->text($attr['help']);
+            unset($attr['help']);
+        }
+
+        // If needed, generate an ID
+        if (($label||array_key_exists('list', $attr)) && !$option_input && !array_key_exists('id', $attr)) {
+            $attr['id'] = self::new_id();
+        }
+
+        $input->attr($attr);
+
         // Gestion des élements exterieurs à l'input
-        $label=null; $help=null;
+        $help=null;
         if (isset($attr['other'])) {
             // 'other' n'est pas un attribut HTML
             $opt = $attr['other'];
@@ -509,10 +566,6 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
 
 
-        // Génération d'un ID si besoin
-        if (($label||array_key_exists('list', $attr)) && !$option_input && !array_key_exists('id', $attr)) {
-            $attr['id'] = self::new_id();
-        }
 
         // Gestion des datalist
         if (isset($attr['list'])) {
@@ -535,32 +588,8 @@ class HTMLElement extends DOMElement implements ArrayAccess
             $return = HTML::input($attr);
         }
 
-        // Rajout du label - avant ou après l'élement suivant $option_input
-        if ($label) {
-            $return = $option_input ? HTML::label($return.' '.$label) : HTML::label(['for'=>$attr['id']], $label).$return;
-        }
-
-        $input = new self($this->document, $type === 'select' ? 'select' : 'input');
         // On retourne le code HTML généré
-        return $return.$datalist.$help;
-    }
-
-    /**
-     * Creates a HTML list
-     * @param string $tagName
-     * @param array $attributes The attributes for the <ol> element
-     * @param string[]|HTMLElement[]|\DOMNodeList $listItems The items of the list
-     * @return \aduh95\HTMLGenerator\List The list object created
-     */
-    protected function appendList($tagName, $attributes = array(), $listItems = array())
-    {
-        if (is_object($attributes) || (count($attributes) && isset($attributes[0]))) {
-            $listItems = $attributes;
-            $attributes = array();
-        }
-        $list = new HTMLList($this->document, $tagName);
-        $this->append($list->attr($attributes)->append($listItems));
-        return $list;
+        return $return;
     }
 
 	public function getDOMElement()
