@@ -78,7 +78,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
         if ($deepRawContent) {
             $this->append($rawContent);
-        } else {
+        } elseif (!empty($rawContent)) {
             $this->nodeValue = $rawContent;
         }
 	}
@@ -448,6 +448,19 @@ class HTMLElement extends DOMElement implements ArrayAccess
         $list = new HTMLList($this->document, $tagName);
         $this->append($list->attr($attributes)->append($listItems));
         return $list;
+    }
+
+    /**
+     * Creates a <form> element
+     * @param array $attr Attributes of the element
+     * @return Form
+     */
+    public function form($attr = array())
+    {
+        $return = new Form($this->document, $attr);
+        $this->append($return);
+
+        return $return;
     }
 
     /**

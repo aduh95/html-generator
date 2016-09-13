@@ -51,16 +51,17 @@ class Form extends HTMLElement
         if (isset($legend)) {
             $fieldset->legend($legend);
         }
-        return $this->addFieldsetGlobal(['legend'=>$legend, 'custom'=>false]);
+        return $fieldset;
     }
 
     /**
      * Creates a <fieldset> added to the current form, puts a <input> into it and returns it
      * @param array $attr
+     * @param array $defaultValue
      *
      * @return HTMLElement The <input> element created
      */
-    public function input($attr)
+    public function input($attr = array(), $defaultValues = array())
     {
         return $this->fieldset()->input($attr, $this->defaultValues);
     }
