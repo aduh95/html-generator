@@ -217,4 +217,52 @@ class HTMLElementTest extends TestCase
         $this->assertStringEndsWith('/firstElement', $element->getNodePath());
         $this->assertSame($element->getDOMElement(), $HTML->getDOMElement()->firstChild);
     }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\HTMLElement::video
+     * @depends testObjectConstructor
+     */
+    public function testVideo($HTML)
+    {
+        $video = $HTML->video();
+
+        $this->assertInstanceOf('aduh95\HTMLGenerator\HTMLElement', $video);
+        $this->assertInstanceOf('DOMElement', $video);
+        $this->assertFalse($video->hasChildNodes());
+        $this->assertSame($video->tagName, 'video');
+
+        $video = $HTML->video(['src'=>'test']);
+        
+        $this->assertFalse($video->hasAttribute('src'));
+        $this->assertTrue($video->hasChildNodes());
+        $this->assertSame($video->firstChild->tagName, 'source');
+        $this->assertTrue($video->firstChild->hasAttribute('src'));
+        $this->assertSame($video->firstChild->getAttribute('src'), 'test');
+        
+        $video = $HTML->video(['src'=>['test', 'other']]);
+        
+        $this->assertFalse($video->hasAttribute('src'));
+        $this->assertTrue($video->hasChildNodes());
+        $this->assertSame($video->firstChild->tagName, 'source');
+        $this->assertTrue($video->firstChild->hasAttribute('src'));
+        $this->assertSame($video->firstChild->getAttribute('src'), 'test');
+        $this->assertSame($video->firstChild->nextSibling->tagName, 'source');
+        $this->assertTrue($video->firstChild->nextSibling->hasAttribute('src'));
+        $this->assertFalse($video->firstChild->nextSibling->hasAttribute('type'));
+        $this->assertSame($video->firstChild->nextSibling->getAttribute('src'), 'other');
+        
+        $video = $HTML->video(['src'=>['video/some'=>'test', 'video/ogg'=>'other']]);
+        
+        $this->assertFalse($video->hasAttribute('src'));
+        $this->assertTrue($video->hasChildNodes());
+        $this->assertSame($video->firstChild->tagName, 'source');
+        $this->assertTrue($video->firstChild->hasAttribute('src'));
+        $this->assertTrue($video->firstChild->hasAttribute('type'));
+        $this->assertSame($video->firstChild->getAttribute('src'), 'test');
+        $this->assertSame($video->firstChild->nextSibling->tagName, 'source');
+        $this->assertTrue($video->firstChild->nextSibling->hasAttribute('src'));
+        $this->assertTrue($video->firstChild->nextSibling->hasAttribute('type'));
+        $this->assertSame($video->firstChild->nextSibling->getAttribute('type'), 'video/ogg');
+        $this->assertSame($video->firstChild->nextSibling->getAttribute('src'), 'other');
+    }
 }
