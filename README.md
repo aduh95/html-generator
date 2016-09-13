@@ -2,7 +2,8 @@
 
 This project is still under developpment, the API may change at any moment. Feel free to contribute or to raise an issue.
 
-This project aims to generate valid and XSS-safe HTML from friendly PHP command. You can use some of the the [jQuery DOM manipulations](http://api.jquery.com/category/manipulation/) methods, because I missed some of them in PHP. The project is built on PHP's [DOM functions](http://php.net/manual/en/book.dom.php), though the performance are quite good.
+This project aims to generate valid and XSS-safe HTML from friendly PHP commands. You can use some of the the [jQuery DOM manipulations](http://api.jquery.com/category/manipulation/) methods, because I missed some of them in PHP. The project is built on PHP's [DOM functions](http://php.net/manual/en/book.dom.php), though the performance are quite good.
+The goal is to be able to "get rid of the `?>` closing tags", to improve readability, even for people who do not know PHP at all.
 
 Here is an overview:
 

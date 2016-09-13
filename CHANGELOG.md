@@ -8,6 +8,9 @@ This file is written using [Markdown syntax](http://daringfireball.net/projects/
 ## [Unreleased]
 ### Added
 - The `HTMLList` class
+- The `Form` class and the `<input>` generation method
+- The `<video>` generation method
+- The `Head::script` and `Head::style` methods
 
 
 ## [0.2.0] - 2016-08-21
