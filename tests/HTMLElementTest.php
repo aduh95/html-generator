@@ -233,11 +233,9 @@ class HTMLElementTest extends TestCase
 
         $video = $HTML->video(['src'=>'test']);
         
-        $this->assertFalse($video->hasAttribute('src'));
-        $this->assertTrue($video->hasChildNodes());
-        $this->assertSame($video->firstChild->tagName, 'source');
-        $this->assertTrue($video->firstChild->hasAttribute('src'));
-        $this->assertSame($video->firstChild->getAttribute('src'), 'test');
+        $this->assertFalse($video->hasChildNodes());
+        $this->assertTrue($video->hasAttribute('src'));
+        $this->assertSame($video->getAttribute('src'), 'test');
         
         $video = $HTML->video(['src'=>['test', 'other']]);
         

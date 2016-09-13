@@ -453,7 +453,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
     /**
      * Creates a video element. This method could be used to shortcut the HTML generation
      * @param array $attr Attributes of the <video> element. You can also specify "src" as
-     *                      attribute, it will create a <source> child element.
+     *                      an array, it will create <source> child elements.
      * @param null|string $fallbackTxt The message which will be displayed for browsers that do
      *                              not support the <video> element
      * @return self The <video> element that has been created
@@ -462,20 +462,16 @@ class HTMLElement extends DOMElement implements ArrayAccess
     {
         $return = new self($this->document, 'video');
 
-        if (empty($attr['src'])) {
-
-        } elseif (is_array($attr['src'])) {
+        if (isset($attr['src']) && is_array($attr['src'])) {
             foreach ($attr['src'] as $type => $src) {
                 $return->source([
                     'type'=>is_numeric($type) ? null : $type,
                     'src'=>$src,
                 ]);
             }
-        } else {
-            $return->source(['src'=>$attr['src']]);
+            unset($attr['src']);
         }
 
-        unset($attr['src']);
         $return->text($fallbackTxt);
         $this->append($return);
 

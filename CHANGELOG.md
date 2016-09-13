@@ -6,6 +6,11 @@ This file follows the [Keep A Changelog](http://keepachangelog.com/en/0.3.0/) pr
 This file is written using [Markdown syntax](http://daringfireball.net/projects/markdown/syntax).
 
 ## [Unreleased]
+### Changed
+- If a string is passed as `src` attribute for a `<video>` element, it will no longer create a `<source>` child.
+
+
+## [0.3.0] - 2016-09-13
 ### Added
 - The `HTMLList` class
 - The `Form` class and the `<input>` generation method
