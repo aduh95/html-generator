@@ -104,7 +104,11 @@ class FormTest extends TestCase
         $this->assertSame($form->firstChild->firstChild->firstChild->textContent, 'test');
         $this->assertSame($form->firstChild->firstChild->firstChild->nextSibling->tagName, 'input');
         $this->assertTrue($form->firstChild->firstChild->firstChild->nextSibling->hasAttribute('id'));
-        $this->assertSame($form->firstChild->firstChild->firstChild->getAttribute('for'), $form->firstChild->firstChild->firstChild->nextSibling->getAttribute('id'));
+        $this->assertSame(
+            $form->firstChild->firstChild->firstChild->getAttribute('for'),
+            $form->firstChild->firstChild->firstChild->nextSibling->getAttribute('id'),
+            'The <label> and the <input> elements are not linked'
+        );
         
 
         $form->empty();
@@ -113,5 +117,72 @@ class FormTest extends TestCase
         $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'label');
         $this->assertSame($form->firstChild->firstChild->firstChild->textContent, 'test');
         $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->tagName, 'input');
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\Form::input
+     * @covers \aduh95\HTMLGenerator\HTMLElement::input
+     * @depends testObjectConstructor
+     */
+    public function testSelectInput($form)
+    {
+        $form->empty();
+
+        $this->assertFalse($form->hasChildNodes());
+
+        $input = $form->input(['type'=>'select']);
+        $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'select');
+        $this->assertFalse($form->firstChild->firstChild->firstChild->hasChildNodes());
+
+        // Test adding <option> elements
+        $form->empty();
+        $input = $form->input(['type'=>'select', 'options'=>['test']]);
+
+        $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'select');
+        $this->assertTrue($form->firstChild->firstChild->firstChild->hasChildNodes());
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->tagName, 'option');
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->textContent, 'test');
+        $this->assertTrue($form->firstChild->firstChild->firstChild->firstChild->hasAttribute('value'));
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->getAttribute('value'), '0');
+        
+
+        // Test <optgroup> support
+        $form->empty();
+        $input = $form->input(['type'=>'select', 'options'=>['option group'=>['test']]]);
+
+        $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'select');
+        $this->assertTrue($form->firstChild->firstChild->firstChild->hasChildNodes());
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->tagName, 'optgroup');
+        $this->assertTrue($form->firstChild->firstChild->firstChild->firstChild->hasAttribute('label'));
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->getAttribute('label'), 'option group');
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->firstChild->tagName, 'option');
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->firstChild->textContent, 'test');
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\Form::input
+     * @covers \aduh95\HTMLGenerator\HTMLElement::input
+     * @depends testObjectConstructor
+     */
+    public function testDatalist($form)
+    {
+        $form->empty();
+
+        $this->assertFalse($form->hasChildNodes());
+
+        $input = $form->input(['list'=>['test']]);
+        $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'input');
+        $this->assertSame($form->firstChild->firstChild->firstChild->nextSibling->tagName, 'datalist');
+        $this->assertTrue($form->firstChild->firstChild->firstChild->nextSibling->hasChildNodes());
+        $this->assertSame($form->firstChild->firstChild->firstChild->nextSibling->firstChild->tagName, 'option');
+        $this->assertSame($form->firstChild->firstChild->firstChild->nextSibling->firstChild->textContent, 'test');
+        
+        $this->assertTrue($form->firstChild->firstChild->firstChild->hasAttribute('list'));
+        $this->assertTrue($form->firstChild->firstChild->firstChild->nextSibling->hasAttribute('id'));
+        $this->assertSame(
+            $form->firstChild->firstChild->firstChild->getAttribute('list'),
+            $form->firstChild->firstChild->firstChild->nextSibling->getAttribute('id'),
+            'The <datalist> and the <input> elements are not linked'
+        );
     }
 }
