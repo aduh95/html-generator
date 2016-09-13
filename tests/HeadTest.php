@@ -108,6 +108,6 @@ class HeadTest extends TestCase
 
         $this->assertSame('link', $head->lastChild->tagName);
         $this->assertTrue($head->lastChild->hasAttribute('rel'));
-        $this->assertTrue($head->lastChild->hasAttribute('heaf'));
+        $this->assertTrue($head->lastChild->hasAttribute('href'));
     }
 }
