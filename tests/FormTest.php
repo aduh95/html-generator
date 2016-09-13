@@ -66,6 +66,7 @@ class FormTest extends TestCase
     }
 
     /**
+     * @covers \aduh95\HTMLGenerator\Form::fieldset
      * @covers \aduh95\HTMLGenerator\Form::input
      * @covers \aduh95\HTMLGenerator\HTMLElement::input
      * @depends testObjectConstructor
@@ -75,7 +76,7 @@ class FormTest extends TestCase
         $form->empty();
 
         $this->assertFalse($form->hasChildNodes());
-        $fieldset = $form->input();
+        $input = $form->input();
 
         $this->assertTrue($form->hasChildNodes());
         $this->assertSame($form->firstChild->tagName, 'fieldset');
@@ -84,5 +85,33 @@ class FormTest extends TestCase
         $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'input');
         $this->assertTrue($form->firstChild->firstChild->firstChild->hasAttribute('type'));
         $this->assertSame($form->firstChild->firstChild->firstChild->getAttribute('type'), 'text');
+    }
+
+    /**
+     * @covers \aduh95\HTMLGenerator\Form::input
+     * @covers \aduh95\HTMLGenerator\HTMLElement::input
+     * @depends testObjectConstructor
+     */
+    public function testInputWithLabel($form)
+    {
+        $form->empty();
+
+        $this->assertFalse($form->hasChildNodes());
+        $input = $form->input(['label'=>'test']);
+
+        $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'label');
+        $this->assertTrue($form->firstChild->firstChild->firstChild->hasAttribute('for'));
+        $this->assertSame($form->firstChild->firstChild->firstChild->textContent, 'test');
+        $this->assertSame($form->firstChild->firstChild->firstChild->nextSibling->tagName, 'input');
+        $this->assertTrue($form->firstChild->firstChild->firstChild->nextSibling->hasAttribute('id'));
+        $this->assertSame($form->firstChild->firstChild->firstChild->getAttribute('for'), $form->firstChild->firstChild->firstChild->nextSibling->getAttribute('id'));
+        
+
+        $form->empty();
+        $input = $form->input(['label'=>'test', 'type'=>'checkbox']);
+
+        $this->assertSame($form->firstChild->firstChild->firstChild->tagName, 'label');
+        $this->assertSame($form->firstChild->firstChild->firstChild->textContent, 'test');
+        $this->assertSame($form->firstChild->firstChild->firstChild->firstChild->tagName, 'input');
     }
 }

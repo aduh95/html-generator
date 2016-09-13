@@ -94,4 +94,12 @@ class DocumentTest extends TestCase
     {
         $body->div();
     }
+
+    /**
+     * @depends testObjectConstructor
+     */
+    public function testCreatingIDs($doc)
+    {
+        $this->assertNotEquals($doc->generateID(), $doc->generateID());
+    }
 }
