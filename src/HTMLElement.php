@@ -514,6 +514,10 @@ class HTMLElement extends DOMElement implements ArrayAccess
                 $label->append($input);
             } else {
                 $return->append($input);
+                if (empty($attr['id'])) {
+                    $attr['id'] = $this->document->generateID($input);
+                }
+                $label['for'] = $attr['id'];
             }
 
             $label->text($attr['label']);
@@ -548,19 +552,13 @@ class HTMLElement extends DOMElement implements ArrayAccess
             }
 
 
-            $attr['list'] = self::new_id();
-            $datalist['id'] = $attr['list'];
+            $attr['list'] = $this->document->generateID($datalist);
         }
 
         // Support for Twitter's bootstrap help block
         if (isset($attr['help'])) {
             $return->div(['class'=>'help-block'])->text($attr['help']);
             unset($attr['help']);
-        }
-
-        // If needed, generate an ID
-        if (isset($label) && !$inputEmbeded && !array_key_exists('id', $attr)) {
-            $attr['id'] = self::new_id();
         }
 
         $input->attr($attr);
