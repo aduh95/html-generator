@@ -529,7 +529,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
         if (isset($attr['options'])) {
             $val = empty($attr['value']) ? array() : (array)$attr['value'];
 
-            foreach ($opt['options'] as $key => $value)
+            foreach ($attr['options'] as $key => $value)
             {
                 // Support for <optgroup> elements
                 if (is_array($value)) {
@@ -541,6 +541,8 @@ class HTMLElement extends DOMElement implements ArrayAccess
                     $input->option(['selected'=>in_array($key, $val), 'value'=>$key])->text($value);
                 }
             }
+
+            unset($attr['options']);
         }
 
         // Support for <datalist> elements
