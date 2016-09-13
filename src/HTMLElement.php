@@ -510,83 +510,48 @@ class HTMLElement extends DOMElement implements ArrayAccess
         }
 
         if (isset($attr['options'])) {
-            //
+            $val = empty($attr['value']) ? array() : (array)$attr['value'];
+
+            foreach ($opt['options'] as $key => $value)
+            {
+                // Support for <optgroup> elements
+                if (is_array($value)) {
+                    $optgroup = $input->optgroup(['label'=>$key]);
+                    foreach ($value as $subkey => $option) {
+                        $optgroup->option(['selected'=>in_array($subkey, $val), 'value'=>$subkey])->text($option);
+                    }
+                } else {
+                    $input->option(['selected'=>in_array($key, $val), 'value'=>$key])->text($value);
+                }
+            }
         }
 
+        // Support for <datalist> elements
         if (isset($attr['list']) && is_array($attr['list'])) {
-            //
+            $datalist = $return->datalist();
+
+            foreach ($attr['list'] as $key => $value) {
+                $datalist->option()->text($value)->attr('value', is_numeric($key) ? null : $key);
+            }
+
+
+            $attr['list'] = self::new_id();
+            $datalist['id'] = $attr['list'];
         }
 
+        // Support for Twitter's bootstrap help block
         if (isset($attr['help'])) {
             $return->div(['class'=>'help-block'])->text($attr['help']);
             unset($attr['help']);
         }
 
         // If needed, generate an ID
-        if (($label||array_key_exists('list', $attr)) && !$option_input && !array_key_exists('id', $attr)) {
+        if (isset($label) && !$inputEmbeded && !array_key_exists('id', $attr)) {
             $attr['id'] = self::new_id();
         }
 
         $input->attr($attr);
 
-        // Gestion des élements exterieurs à l'input
-        $help=null;
-        if (isset($attr['other'])) {
-            // 'other' n'est pas un attribut HTML
-            $opt = $attr['other'];
-            unset($attr['other']);
-
-            // Gestion des labels
-            $label= empty($opt['label']) ? false : $this->document->createTextNode($opt['label']);
-
-            // Gestion des options pour les <select> ou les <datalist>
-            if (isset($opt['options'])) {
-                $val = empty($attr['value']) ? array() : (is_array($attr['value']) ? $attr['value'] : [$attr['value']]);
-                $options=null;
-                foreach ($opt['options'] as $key => $value)
-                {
-                    // Gestion des <optgroup>
-                    if (is_array($value)) {
-                        $optgroup = '';
-                        foreach ($value as $subkey => $option) {
-                            $optgroup.=HTML::option(['selected'=>in_array($subkey, $val), 'value'=>$subkey], $option, true);
-                        }
-                        $options.=HTML::optgroup(['label'=>$key], $optgroup);
-                    } else {
-                        $options.=HTML::option(['selected'=>in_array($key, $val), 'value'=>$key], $value, true);
-                    }
-                }
-            }
-
-            // Gestion des help-boxes
-            if (isset($opt['help'])) {
-                $help = HTML::span(['class'=>'help-block'], $opt['help'], true);
-            }
-        }
-
-
-
-
-        // Gestion des datalist
-        if (isset($attr['list'])) {
-            $datalist = static::inputGenerate(['type'=>'datalist', 'other'=>['options'=>$attr['list']], 'id'=>$attr['list']=self::new_id(), 'class'=>'']);
-        } else {
-            $datalist=null;
-        }
-
-        // Gestion des inputs qui n'utilisent pas la balise HTML <input>
-        if (in_array($type, ['textarea', 'select', 'datalist'])) {
-            $val =  isset($options) ?
-                        $options :
-                (   isset($attr['value']) ?
-                        HTML::noXSS($attr['value']):
-                        null
-                );
-            unset($attr['value'], $attr['type'], $attr['other']);
-            $return = HTML::tag($type, $attr, $val);
-        } else {
-            $return = HTML::input($attr);
-        }
 
         // On retourne le code HTML généré
         return $return;

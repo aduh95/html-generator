@@ -48,8 +48,9 @@ class Form extends HTMLElement
     public function fieldset($legend = null)
     {
         $fieldset = parent::fieldset();
-        if ($legend)
-        $fieldset->legend($legend);
+        if (isset($legend)) {
+            $fieldset->legend($legend);
+        }
         return $this->addFieldsetGlobal(['legend'=>$legend, 'custom'=>false]);
     }
 
