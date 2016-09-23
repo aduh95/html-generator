@@ -204,6 +204,11 @@ class Document
         return new HTMLElement($this, $tagName, $rawContent);
     }
 
+    public function createTextNode($textContent)
+    {
+        return $this->dom->createTextNode($textContent);
+    }
+
     public function __toString()
     {
         return $this->dom->saveHTML();
