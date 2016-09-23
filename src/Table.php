@@ -216,6 +216,8 @@ class Table extends HTMLElement
                     foreach ($line as $content) {
                         if (is_array($content)) {
                             $this->append($content);
+                        } elseif ($content instanceof DOMElement && $content->tagName === 'td') {
+                            $newLine->append($content);
                         } else {
                             $newLine->td()->text($content);
                         }
