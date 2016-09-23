@@ -55,6 +55,7 @@ class HTMLList extends HTMLElement implements Countable
     {
         switch (func_num_args()) {
             case 0:
+                return parent::append();
                 break;
 
             case 1:
@@ -76,6 +77,8 @@ class HTMLList extends HTMLElement implements Countable
                             $this->li()->append($lineElem);
                         }
                     }
+                } elseif ($item instanceof EmptyElement) {
+                    return parent::append($item);
                 } else {
                     $this->li()->append($item);
                 }
