@@ -8,6 +8,11 @@ This file is written using [Markdown syntax](http://daringfireball.net/projects/
 ## [Unreleased]
 ### Changed
 - If a string is passed as `src` attribute for a `<video>` element, it will no longer create a `<source>` child.
+- Patch a bug on `HTMLList` when trying to use the usual `HTMLElement` behaviour
+- When passing `<td>` elements to a table row, it will be used to create the actual table cell
+
+### Added
+- `Document::createTextNode` method, which is just a shortcut for the DOM method
 
 
 ## [0.3.0] - 2016-09-13
