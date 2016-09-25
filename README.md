@@ -1,17 +1,36 @@
 #HTML Generator
 
-This project is still under developpment, although is very stable. Version `1.0.0` will be released soon. Feel free to contribute or to raise an issue.
-
 This project aims to generate valid and XSS-safe HTML from friendly PHP commands. You can use some of the the [jQuery DOM manipulations](http://api.jquery.com/category/manipulation/) methods, because I missed some of them in PHP. The project is built on PHP's [DOM functions](http://php.net/manual/en/book.dom.php), though the performance are quite good.
 The goal is to improve readability (even for people who do not know PHP at all) and make it easier to detect and to avoid XSS. You won't need the `?>` closing tag anymore!
 
-Here is an overview:
+
+If you think this librairy lacks a feature or have some bad design, feel free to contribute or to raise an issue.
+
+## Installation
+
+The easiest way: using [Composer](http://getcomposer.com)
+
+```sh
+composer install aduh95/html-generator
+```
+
+If you don't use Composer (and really you should!), you can also clone this repo and include the PHP classes which follow the [PSR-4](www.php-fig.org/psr/psr-4/).
+
+## Getting started
+
+I would recommend to subclass the `Document` class to include your usual html tags. As soon as I have time, I will put examples in the wiki.
+
+Here is an overview of the main features:
 
 ```php
 <?php
 require 'vendor/autoload.php';
 
 $doc = new aduh95\HTMLGenerator\Document('My title', 'en');
+
+// If you want PHP to render you HTML in a way a human can read it
+// Default is compressed
+$doc->getDOMDocument()->formatOutput = true;
 
 // Add attribute array-like
 $doc->getHead()->appendChild($doc->createElement('meta'))['charset'] = 'uft-8';
@@ -49,9 +68,6 @@ $table[] = [$doc->createElement('td')->attr('rowspan', 3)->text('another'), 'one
 $table
     ->append(['data', 'in', 'the', 'row'])
     ->append([['multi', 'row'], ['so', 'easy']]);
-
-// If you want PHP to render you HTML in a way a human can read it
-$doc->getDOMDocument()->formatOutput = true;
 
 // This line is optionnal, the document will be automatically output at the end of ths script
 echo $doc;
