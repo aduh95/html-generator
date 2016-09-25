@@ -14,7 +14,23 @@ The easiest way: using [Composer](http://getcomposer.com)
 composer install aduh95/html-generator
 ```
 
-If you don't use Composer (and really you should!), you can also clone this repo and include the PHP classes which follow the [PSR-4](www.php-fig.org/psr/psr-4/).
+Then, you have to include Composer's autoload file at the begining of your scripts.
+
+```php
+<?php
+require 'vendor/autoload.php';
+?>
+```
+
+If you don't use Composer (and really you should!), you can use the PHAR archive you'll find in the Releases section.
+
+```php
+<?php
+require 'HTMLGenerator.phar';
+?>
+```
+
+You can also clone this repo and include the PHP classes which follow the [PSR-4](www.php-fig.org/psr/psr-4/).
 
 ## Getting started
 

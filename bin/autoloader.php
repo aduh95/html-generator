@@ -10,7 +10,7 @@ if(!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50601)
 spl_autoload_register(function ($class) {
     if (substr($class, 0, 21)==='aduh95\\HTMLGenerator\\') {
         $class = substr($class, 21);
-        $file = __DIR__.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.$class.'.php';
+        $file = __DIR__.DIRECTORY_SEPARATOR.$class.'.php';
 
         if (is_readable($file))
             include $file;
