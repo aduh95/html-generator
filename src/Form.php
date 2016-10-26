@@ -42,7 +42,7 @@ class Form extends HTMLElement
     }
 
     /**
-     * @param string|array $legend The legend of your fieldset, or the attributes of the element
+     * @param string|array $legend The legend of your fieldset, or the attributes of the <legend> element
      * @return HTMLElement The <fieldset> element
      */
     public function fieldset($legend = null)
