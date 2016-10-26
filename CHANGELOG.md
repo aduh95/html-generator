@@ -7,6 +7,14 @@ This file is written using [Markdown syntax](http://daringfireball.net/projects/
 
 ## [Unreleased]
 ### Changed
+ - `aduh95\HTMLGenerator\Head` class - Patch a bug on `script` and `style` methods when an array was passed
+
+### Added
+ - `aduh95\HTMLGenerator\Head` class - Add the `async` attribute to the `script`method
+
+
+## [1.0.0] - 2016-09-25
+### Changed
 - If a string is passed as `src` attribute for a `<video>` element, it will no longer create a `<source>` child.
 - Patch a bug on `HTMLList` when trying to use the usual `HTMLElement` behaviour
 - When passing `<td>` elements to a table row, it will be used to create the actual table cell

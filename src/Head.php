@@ -60,25 +60,26 @@ class Head extends SubRootElement
     /**
      * Attachs a script to the head element
      * @param array|string $src The (absolute or relative) path to the source or an array of attributs
+     * @param boolean $async Sets the HTML async parameter
      * @param boolean $defer Sets the HTML defer parameter
-     * 
+     *
      * @return self instance
      */
-    public function script($src, $defer = true)
+    public function script($src, $async = true, $defer = true)
     {
-        parent::script(['src'=>$src, 'defer'=>$defer]);
+        parent::script(is_array($src) ? $src : ['src'=>$src, 'async'=>$async, 'defer'=>$defer]);
         return $this;
     }
 
     /**
      * Attachs a style sheet to the head element
      * @param array|string $href The (absolute or relative) path to the source or an array of attributs
-     * 
+     *
      * @return self instance
      */
     public function style($href)
     {
-        parent::link(['href'=>$href, 'rel'=>'stylesheet', 'type'=>"text/css"]);
+        parent::link(is_array($href) ? $href : ['href'=>$href, 'rel'=>'stylesheet', 'type'=>"text/css"]);
         return $this;
     }
 }
