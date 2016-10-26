@@ -99,9 +99,10 @@ class HTMLElement extends DOMElement implements ArrayAccess
 	}
 
     /**
-     * Appends the element(s) in parameter at the end of the current Node
+     * Appends the element(s) in parameter at the end of the current Node,
+     * or returns an EmptyElement which has this element as parent.
      * @param mixed ...$elem
-     * @return self
+     * @return self | EmptyElement
      */
 	public function append($elem = null)
 	{
@@ -522,7 +523,7 @@ class HTMLElement extends DOMElement implements ArrayAccess
 
         $attr['class'] = isset($attr['class']) ? $attr['class'] : 'form-control';
         $inputEmbeded = $type==='radio' || $type==='checkbox';
-         
+
         if ($type==='textarea') {
             $input = new self($this->document, 'textarea');
             $input->text($attr['value']);
