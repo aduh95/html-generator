@@ -8,7 +8,7 @@ If you think this librairy lacks a feature or have some bad design, feel free to
 
 ## Installation
 
-The easiest way: using [Composer](http://getcomposer.com)
+The easiest way: using [Composer](https://getcomposer.org)
 
 ```sh
 composer require aduh95/html-generator
