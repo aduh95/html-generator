@@ -1,4 +1,4 @@
-#HTML Generator
+# HTML Generator
 
 This project aims to generate valid and XSS-safe HTML from friendly PHP commands. You can use some of the the [jQuery DOM manipulations](http://api.jquery.com/category/manipulation/) methods, because I missed some of them in PHP. The project is built on PHP's [DOM functions](http://php.net/manual/en/book.dom.php), though the performance are quite good.
 The goal is to improve readability (even for people who do not know PHP at all) and make it easier to detect and to avoid XSS. You won't need the `?>` closing tag anymore!
@@ -11,7 +11,7 @@ If you think this librairy lacks a feature or have some bad design, feel free to
 The easiest way: using [Composer](http://getcomposer.com)
 
 ```sh
-composer install aduh95/html-generator
+composer require aduh95/html-generator
 ```
 
 Then, you have to include Composer's autoload file at the begining of your scripts.
