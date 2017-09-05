@@ -62,6 +62,11 @@ class TableTest extends TestCase
         $table[]= ['I gat powa', 'I am a powerful tool.'];
         $table[]= ['HTML&amp;Cie.', 'UTF-8: ♥'];
 
+        $this->assertInstanceOf(
+            'aduh95\HTMLGenerator\HTMLElement',
+            $table->tr(['colspan'=>3])->td('test')
+        );
+
         if (!is_file(Table\WHOLE_TABLE_HTML)) {
             $fileHandler = fopen(Table\WHOLE_TABLE_HTML, 'w');
             fwrite($fileHandler, $doc);

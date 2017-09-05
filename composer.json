@@ -1,38 +1,37 @@
 {
-	"name": "aduh95/html-generator",
-	"description": "HTML generator in PHP, implementing most of the jQuery DOM manipulation API",
-	"keywords": ["php", "html", "dom", "generator", "jquery"],
-	"authors": [
-		{
-			"name": "Antoine du HAMEL",
-			"email": "duhamelantoine1995@gmail.com"
-		}
-	],
-	"support": {
-		"issues": "https://github.com/aduh95/html-generator/issues",
-		"wiki": "https://github.com/aduh95/html-generator/wiki",
-		"source": "https://github.com/aduh95/html-generator/releases"
-	},
-	"autoload": {
-		"psr-4": {
-			"aduh95\\HTMLGenerator\\": "src/"
-		}
-	},
-	"suggest": {
-		"wa72/htmlpagedom": "To add some more jQuery implementation in PHP",
+    "name": "aduh95/html-generator",
+    "description": "HTML generator in PHP, implementing most of the jQuery DOM manipulation API",
+    "keywords": ["php", "html", "dom", "generator", "jquery"],
+    "authors": [
+        {
+            "name": "Antoine du HAMEL",
+            "email": "duhamelantoine1995@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/aduh95/html-generator/issues",
+        "wiki": "https://github.com/aduh95/html-generator/wiki",
+        "source": "https://github.com/aduh95/html-generator/releases"
+    },
+    "autoload": {
+        "psr-4": {
+            "aduh95\\HTMLGenerator\\": "src/"
+        }
+    },
+    "suggest": {
+        "wa72/htmlpagedom": "To add some more jQuery implementation in PHP",
         "wa72/html-pretty-min": "Minify or indent HTML documents"
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"aduh95\\HTMLGenerator\\tests\\": "tests/"
-		},
-		"files": [
-			"tests/bootstrap.php"
-		]
-	},
-	"require-dev": {
-		"phpunit/phpunit": "~5.0",
-		"phpdocumentor/phpdocumentor": "~2.0"
-	},
-	"license": "MIT"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "aduh95\\HTMLGenerator\\tests\\": "tests/"
+        },
+        "files": ["tests/bootstrap.php"]
+    },
+    "scripts": { "test": "php ./vendor/phpunit/phpunit/phpunit ./tests" },
+    "require-dev": {
+        "phpunit/phpunit": "~5.0",
+        "phpdocumentor/phpdocumentor": "~2.0"
+    },
+    "license": "MIT"
 }

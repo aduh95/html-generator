@@ -192,6 +192,15 @@ class Table extends HTMLElement
     }
 
     /**
+     * Add row to the table's body
+     * @return HTMLElement The <tr> object created
+     */
+    public function tr()
+    {
+        return call_user_func_array([$this->tbody, 'tr'], func_get_args());
+    }
+
+    /**
      * Add a line to the tbody of the current table
      *
      * If you pass an array of string, a DOMNodeList (containing <td> or <th>)
@@ -216,13 +225,17 @@ class Table extends HTMLElement
                     foreach ($line as $content) {
                         if (is_array($content)) {
                             $this->append($content);
-                        } elseif ($content instanceof DOMElement && $content->tagName === 'td') {
-                            $newLine->append($content);
+                        } elseif ($content instanceof DOMElement) {
+                            if ($content->tagName === 'td') {
+                                $newLine->append($content);
+                            } else {
+                                $newLine->td()->append($content);
+                            }
                         } else {
                             $newLine->td()->text($content);
                         }
                     }
-                } elseif ($line instanceof DOMElement && strtolower($line->nodeName)==='tr') {
+                } elseif ($line instanceof DOMElement && $line->tagName === 'tr') {
                     $this->tbody->append($line);
                 } elseif ($line instanceof DOMNodeList) {
                     foreach ($line as $lineElem) {
@@ -244,9 +257,7 @@ class Table extends HTMLElement
                 }
                 if(!$newLine->getDOMElement()->hasChildNodes()) {
                     $newLine->remove();
-                }
-
-                if ($this->options & self::AUTO_TFOOT) {
+                } elseif ($this->options & self::AUTO_TFOOT) {
                     $this->autoTFoot();
                 }
                 break;
